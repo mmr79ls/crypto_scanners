@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 import seaborn as sns
-from crypto_func import BTC_drop_change,group_tweets
+from crypto_func import BTC_drop_change,group_tweets,df_adjust_step,get_bidask
 
 def draw_filtered(ask_filtered,bid_filtered,symbol):
     sns.set(rc={'figure.figsize':(200,150)})
@@ -39,33 +39,44 @@ def draw_filtered(ask_filtered,bid_filtered,symbol):
         return g
 
 
-quote=st.text_input('Enter the base coint BTC or USDT','USDT')
-percentage=st.number_input('Enter percantage for orderbook aggregation',1.0)
+
+quote=st.selectbox('Symbol',['USDT','BTC'])
 #symbol=st.text_input('enter the symbol')
 
 @st.cache(allow_output_mutation=True)
-def scan(percentage,quote):
-    a=crypto('binance',percentage,quote)  
-    a.scanner()
-    
-    symbols=a.bid.symbol.unique()
+def scan(quote):
+    print(quote)
+    a=crypto('binance',quote)  
+    df_bid_ex,df_ask_ex,prices  =a.scanner()
+    print('scan done')
+    #symbols=a.bid.symbol.unique()
     #time_tuple=(2021, 3, 30, 00, 00, 00, 0, 00, 0)
     #OHLCV=a.get_OHLCV(time_tuple,'1h')
     #a.get_tweets()
-    return a,symbols
+    return a,df_bid_ex,df_ask_ex,prices 
+@st.cache(allow_output_mutation=True)
+def percentage_stept(df_bid_ex,df_ask_ex,quote,step_percentage,prices ):
+    print(quote)
+    df_bid_adjusted,df_ask_adjusted=df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices)
 
-a,symbols=scan(percentage,quote)
-
-filter=st.text_input('input the minmum aggregated value filter in 4 BTC or 4 USDT',"4 BTC")
+    return df_bid_adjusted,df_ask_adjusted 
 
 
+a,df_bid_ex,df_ask_ex,prices=scan(quote)
+st.balloons()
+percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
+df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices)
+filter=st.text_input('input the minmum aggregated value filter in 4 BTC or 4 USDT','4 BTC')
+
+print(df_bid_adjusted)
 f=list(filter.split())
 if f[1]=='BTC':
     BTC_filter=float(f[0])
-    ask_filtered,bid_filtered=a.get_bidask(BTC_filter,0)
+    ask_filtered,bid_filtered=get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=BTC_filter,USDT=0)
 elif f[1]=='USDT':
     USDT_filter=float(f[0])
-    ask_filtered,bid_filtered= a.get_bidask(0,USDT_filter)
+    ask_filtered,bid_filtered= get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=USDT_filter)
+print(ask_filtered)
 temp=pd.concat([ask_filtered,bid_filtered])
 symbols=temp.symbol.unique()
 st.write('Number of symbols detected are ' + str(len(symbols)))

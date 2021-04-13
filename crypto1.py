@@ -23,13 +23,13 @@ import re
 
 
 class crypto():
-    def __init__(self, exchange, step_percentage,quote):
+    def __init__(self, exchange=['binance'],quote='USDT'):
       self.exchanges = ['binance']
-      self.step_percentage = 1
-      self.quote='USDT'
-      binance = ccxt.binance ()
-      markets = binance.load_markets ()
-      self.btc_usdt=pd.DataFrame(binance.fetch_ticker('BTC/USDT')).close[0]
+      #self.step_percentage = step_percentage
+      self.quote=quote
+      Bitfinex = ccxt.binance()
+      markets = Bitfinex.load_markets ()
+      self.btc_usdt=pd.DataFrame(Bitfinex.fetch_ticker('BTC/USDT')).close[0]
       self.flag=0
             
     def scanner(self):
@@ -47,7 +47,7 @@ class crypto():
         ex=eval ('ccxt.%s ()' % id)
         quote=self.quote
         #symbols=pairs_check(ex,quote=self.quote)  
-            
+        prices={}   
         df_pairs = pd.DataFrame(getattr(ex, 'fetchMarkets')())
         df=df_pairs[df_pairs.quote==quote]
         symbols=df.symbol
@@ -60,8 +60,10 @@ class crypto():
           else:
             self.flag=0
           if self.flag==1:
+            print(symbols)
             for symbol in symbols:
             #self.flag=valid_check(ex,symbol)
+                time.sleep (ex.rateLimit / 1000) 
                 try:
                     ex.fetch_ticker(symbol)
                     orderbook = getattr(ex, 'fetchL2OrderBook')(symbol,10000) 
@@ -72,63 +74,35 @@ class crypto():
               
                     #orderbook = getattr(ex, 'fetchL2OrderBook')(symbol,10000)
                     a=pd.DataFrame(ex.fetch_ticker(symbol))
-                    price=a[a.symbol==symbol].close[0]
+                    prices[symbol]=a[a.symbol==symbol].close[0]
                     df_ask=pd.DataFrame(orderbook['asks'],columns=['ask','amount'])           
                     df_bid=pd.DataFrame(orderbook['bids'],columns=['bid','amount'])
-                    
-                if (len(df_bid) !=0) & (len(df_ask) !=0):
-                      
-                    #df_bid,df_ask=calculate_price(df_bid,df_ask,quote)
+                    df_ask['exchange']=id
+                    df_ask['symbol']=symbol
+                    df_bid['exchange']=id
+                    df_bid['symbol']=symbol
                     if(self.quote=='USDT'):
-                        df_bid['amount_USDT']=df_bid['amount']*df_bid['bid']
-                        df_ask['amount_USDT']=df_ask['amount']*df_ask['ask']
-                        df_bid['amount_BTC']=df_bid['amount_USDT']/self.btc_usdt
-                        df_ask['amount_BTC']=df_ask['amount_USDT']/self.btc_usdt
+                            df_bid['amount_USDT']=df_bid['amount']*df_bid['bid']
+                            df_ask['amount_USDT']=df_ask['amount']*df_ask['ask']
+                            df_bid['amount_BTC']=df_bid['amount_USDT']/self.btc_usdt
+                            df_ask['amount_BTC']=df_ask['amount_USDT']/self.btc_usdt
                     elif(self.quote=='BTC'):
-                        df_bid['amount_BTC']=df_bid['amount']*df_bid['bid']
-                        df_ask['amount_BTC']=df_ask['amount']*df_ask['ask']
-                        df_bid['amount_USDT']=df_bid['amount_BTC']/self.btc_usdt
-                        df_ask['amount_USDT']=df_ask['amount_BTC']/self.btc_usdt
-                    maxs=df_bid["bid"].max()
-                    mins=df_bid["bid"].min()
-                    if(maxs>price*2):
-                          maxs=price*2
-                    if(mins<price/2):
-                          mins=price/2
-                    step=mins*self.step_percentage/100
-                    #print(mins," ",maxs," ",step," ",price)
-                    if((mins>0) and (step>0) and (maxs>0)):
-                        df_bid=df_bid.groupby(pd.cut(df_bid["bid"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','bid':'mean','amount_BTC':sum,'amount_USDT':sum})
-                        df_bid['price']=df_bid.index
-                        
-                        mins=df_ask["ask"].min()
-                        maxs=df_ask["ask"].max()
-                        if(maxs>price*2):
-                            maxs=price*2
-                        if(mins<price/2):
-                            mins=price/2
-                            
-                        step=mins*self.step_percentage/100
-                    if((mins>0) and (step>0) and (maxs>0)):
-                        df_ask=df_ask.groupby(pd.cut(df_ask["ask"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','ask':'mean','amount_BTC':sum,'amount_USDT':sum})
-                        df_ask['price']=df_ask.index
-                        
-                        df_ask['exchange']=id
-                        df_ask['symbol']=symbol
-                        df_bid['exchange']=id
-                        df_bid['symbol']=symbol
-                        #df_bid,df_ask=calculate_price(df_bid,df_ask,quote)
-                        df_ask_ex=pd.concat([df_ask,df_ask_ex],ignore_index=True)
-                        df_bid_ex=pd.concat([df_bid,df_bid_ex],ignore_index=True)
-                else:
-                     continue
+                            df_bid['amount_BTC']=df_bid['amount']*df_bid['bid']
+                            df_ask['amount_BTC']=df_ask['amount']*df_ask['ask']
+                            df_bid['amount_USDT']=df_bid['amount_BTC']/self.btc_usdt
+                            df_ask['amount_USDT']=df_ask['amount_BTC']/self.btc_usdt
+                    df_ask_ex=pd.concat([df_ask,df_ask_ex],ignore_index=True)
+                    df_bid_ex=pd.concat([df_bid,df_bid_ex],ignore_index=True)  
+            end = time.time()  
+            elapsed = end - start
+            print(elapsed)
+            return df_bid_ex,df_ask_ex,prices
          
 
-      end = time.time()  
-      elapsed = end - start
-      print(elapsed)
-      self.bid= df_bid_ex
-      self.ask=df_ask_ex
+      
+     # 
+     # self.bid= df_bid_ex
+     # self.ask=df_ask_ex
     def get_bidask(self,BTC=0,USDT=0):
         if float(BTC)>0:
             self.ask_filtered=self.ask[self.ask['amount_BTC']>float(BTC)]
@@ -305,8 +279,8 @@ class crypto():
               df_tweet=pd.DataFrame(self.data,columns=['time','coin_count','coin','amount_USD','source','destination'])
 
 
-              df_tweet.coin_count=df_tweet.coin_count.apply(lambda x : x.replace(',','')).astype(int)
-              df_tweet.amount_USD=df_tweet.amount_USD.apply(lambda x : x.replace(',','')).astype(int)
+              df_tweet.coin_count=df_tweet.coin_count.apply(lambda x : x.replace(',','')).astype('int64')
+              df_tweet.amount_USD=df_tweet.amount_USD.apply(lambda x : x.replace(',','')).astype('int64')
               df_tweet.sort_values('amount_USD',ascending=False)
               df_tweet.drop_duplicates(inplace=True)
               self.tweets=df_tweet
