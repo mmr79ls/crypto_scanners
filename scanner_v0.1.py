@@ -49,6 +49,7 @@ def scan(quote):
     a=crypto('binance',quote)  
     df_bid_ex,df_ask_ex,prices  =a.scanner()
     print('scan done')
+    st.write('last updated on '+str(time.time()))
     #symbols=a.bid.symbol.unique()
     #time_tuple=(2021, 3, 30, 00, 00, 00, 0, 00, 0)
     #OHLCV=a.get_OHLCV(time_tuple,'1h')
@@ -63,8 +64,12 @@ def percentage_stept(df_bid_ex,df_ask_ex,quote,step_percentage,prices ):
 
 
 a,df_bid_ex,df_ask_ex,prices=scan(quote)
+flag=st.button('rescan again')
+if flag==1:
+    a,df_bid_ex,df_ask_ex,prices=scan(quote)  
+    
 st.balloons()
-percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
+percentage=st.number_input('Enter percantage for orderbook aggregation',0.1)
 df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices)
 filter=st.text_input('input the minmum aggregated value filter in 4 BTC or 4 USDT','4 BTC')
 
