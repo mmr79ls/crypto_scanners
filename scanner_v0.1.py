@@ -7,6 +7,7 @@ import streamlit as st
 import numpy as np
 import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,df_adjust_step,get_bidask
+import time
 
 def draw_filtered(ask_filtered,bid_filtered,symbol):
     sns.set(rc={'figure.figsize':(200,150)})
