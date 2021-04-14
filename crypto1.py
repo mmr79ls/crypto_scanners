@@ -172,7 +172,7 @@ class crypto():
             for symbol in symbols:
                
                 time.sleep (exchange.rateLimit / 700) # time.sleep wants seconds
-                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,since =int(starttime)),columns=['Time','Open','High','Low','Close','Volume'])
+                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =10000),columns=['Time','Open','High','Low','Close','Volume'])
                 a['Date']=pd.to_datetime(a['Time']*1000000)
                 a['symbol']=symbol
                 a['change']=self.comp_prev(a)
