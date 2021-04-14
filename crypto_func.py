@@ -1,9 +1,28 @@
 
 import pandas as pd
 import numpy as np
+import time
+from time import struct_time
+import streamlit as st
+from math import pi
+from bokeh.plotting import figure
+from bokeh.io import output_notebook, show
+from bokeh.resources import INLINE
+from bokeh.models import LinearAxis, Range1d,HBar,HoverTool
+from bokeh.models import ColumnDataSource, Label, LabelSet, Range1d
+output_notebook(resources=INLINE)
+from bokeh.plotting import figure, output_file, show
+import tweepy
+import re
 
-def BTC_drop_change(OHLCV,start,end,change_low,change_high):    
+def BTC_drop_change(OHLCV,start,end,change_low,change_high): 
+            print(start)
+            print(end)
+            print(OHLCV)
+            print(OHLCV.Date)
+            print(start)
             filtered=OHLCV[(OHLCV['Date'] >= start) & (OHLCV['Date'] <= end)]
+            print('filtered',len(filtered))
             OHLCV_change=filtered[(filtered['change']>=change_low) & (filtered['change']<=change_high)].sort_values('change')
             return OHLCV_change
 
@@ -74,3 +93,48 @@ def get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=0):
             ask_filtered=df_ask_adjusted[df_ask_adjusted['amount_USDT']>float(USDT)]
             bid_filtered=df_bid_adjusted[df_bid_adjusted['amount_USDT']>float(USDT)]
         return ask_filtered,bid_filtered
+    
+    
+def plot_bokeh(into,outfrom,df):
+              #into=self.into
+              #outfrom=self.outfrom
+              #output_file("label.html", title="label.py example")
+              z=outfrom.drop(['destination','source','amount_USD'],axis=1)
+              z=z.reset_index()
+              print(z)
+              #source = ColumnDataSource(data=z)
+              df_ = df.copy()
+              symbol=df['symbol'].unique()[0]
+              inc = df_.Close > df_.Open
+              dec = df_.Open > df_.Close
+              #up=z.coin_price>z.Close
+              #down=z.coin_price<z.Close
+              _tools_to_show = 'box_zoom,pan,save,hover,reset,tap,wheel_zoom'        
+              TOOLTIPS = [
+                    #("Date", "$x"),
+                    ("Number of bitcoints :", "@coin_count"),
+                    ("Price"," @coin_price"),
+                     ("Close", "@close{0.0 }"),
+                
+                ]
+              p = figure(width=1000, height=910 ,x_axis_type="datetime", tools=_tools_to_show,tooltips=TOOLTIPS,title = symbol)
+              w = 1*60*60*800
+             # p = figure(x_axis_type="datetime", plot_width=1100, plot_height=500, title = symbol)
+              p.segment(df_.index, df_.High, df_.index, df_.Low, color="black")
+              p.vbar(df_.index[inc], w, df_.Open[inc], df_.Close[inc], fill_color="green", line_color="red")
+              p.vbar(df_.index[dec], w, df_.Open[dec], df_.Close[dec], fill_color="red", line_color="green")
+              #p.y_range = Range1d(df.Close.min(), df.Close.max()+10000)
+              #p.extra_y_ranges = {"NumStations": Range1d(start=0, end=a.coin_count.max()+10000)}
+              #p.add_layout(LinearAxis(y_range_name="NumStations"), 'right')
+              #y_range_name='NumStations'
+              average_in=into.coin_count.mean()
+              average_out=outfrom.coin_count.mean()
+              p.triangle(outfrom.index, outfrom.coin_price,name="mycircle",angle =3.14,fill_alpha=0.5,color='green',size=5*outfrom.coin_count/average_out)
+              p.triangle(into.index, into.coin_price,name="mycircle",fill_alpha=0.5 ,color='red',size=5*into.coin_count/average_in)
+              #labels = LabelSet(x='time', y='coin_price', text='coin_count', level='glyph', x_offset=5, y_offset=5, source=source, render_mode='canvas')
+
+
+              #p.add_layout(labels)
+
+
+              st.bokeh_chart(p)
