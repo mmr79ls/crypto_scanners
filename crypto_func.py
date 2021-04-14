@@ -110,14 +110,8 @@ def plot_bokeh(into,outfrom,df):
               #up=z.coin_price>z.Close
               #down=z.coin_price<z.Close
               _tools_to_show = 'box_zoom,pan,save,hover,reset,tap,wheel_zoom'        
-              TOOLTIPS = [
-                    #("Date", "$x"),
-                    ("Number of bitcoints :", "@coin_count"),
-                    ("Price"," @coin_price"),
-                     ("Close", "@close{0.0 }"),
-                
-                ]
-              p = figure(width=1000, height=910 ,x_axis_type="datetime", tools=_tools_to_show,tooltips=TOOLTIPS,title = symbol)
+            
+              p = figure(width=1000, height=910 ,x_axis_type="datetime", tools=_tools_to_show,title = symbol)
               w = 1*60*60*800
              # p = figure(x_axis_type="datetime", plot_width=1100, plot_height=500, title = symbol)
               p.segment(df_.index, df_.High, df_.index, df_.Low, color="black")
