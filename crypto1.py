@@ -60,10 +60,14 @@ class crypto():
           else:
             self.flag=0
           if self.flag==1:
-            print(symbols)
+            
+            length=len(symbols)
+            counter=0
             for symbol in symbols:
             #self.flag=valid_check(ex,symbol)
                 time.sleep (ex.rateLimit / 1000) 
+                counter+=1
+                print(counter/length)
                 try:
                     ex.fetch_ticker(symbol)
                     orderbook = getattr(ex, 'fetchL2OrderBook')(symbol,10000) 
@@ -75,12 +79,16 @@ class crypto():
                     #orderbook = getattr(ex, 'fetchL2OrderBook')(symbol,10000)
                     a=pd.DataFrame(ex.fetch_ticker(symbol))
                     prices[symbol]=a[a.symbol==symbol].close[0]
-                    df_ask=pd.DataFrame(orderbook['asks'],columns=['ask','amount'])           
+                    price=a[a.symbol==symbol].close[0]
+                    df_ask=pd.DataFrame(orderbook['asks'],columns=['ask','amount'])  
                     df_bid=pd.DataFrame(orderbook['bids'],columns=['bid','amount'])
                     df_ask['exchange']=id
                     df_ask['symbol']=symbol
                     df_bid['exchange']=id
                     df_bid['symbol']=symbol
+                    df_ask['price'] = a[a.symbol==symbol].close[0]
+                    df_bid['price'] = a[a.symbol==symbol].close[0]
+
                     if(self.quote=='USDT'):
                             df_bid['amount_USDT']=df_bid['amount']*df_bid['bid']
                             df_ask['amount_USDT']=df_ask['amount']*df_ask['ask']
@@ -91,6 +99,8 @@ class crypto():
                             df_ask['amount_BTC']=df_ask['amount']*df_ask['ask']
                             df_bid['amount_USDT']=df_bid['amount_BTC']/self.btc_usdt
                             df_ask['amount_USDT']=df_ask['amount_BTC']/self.btc_usdt
+                    df_ask['price_diff']=df_ask.ask.apply(lambda x: (price-x)*100/price)
+                    df_bid['price_diff']=df_bid.bid.apply(lambda x: (price-x)*100/price)
                     df_ask_ex=pd.concat([df_ask,df_ask_ex],ignore_index=True)
                     df_bid_ex=pd.concat([df_bid,df_bid_ex],ignore_index=True)  
             end = time.time()  
@@ -98,7 +108,7 @@ class crypto():
             print(elapsed)
             return df_bid_ex,df_ask_ex,prices
          
-
+    
       
      # 
      # self.bid= df_bid_ex

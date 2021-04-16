@@ -14,7 +14,7 @@ def draw_filtered(ask_filtered,bid_filtered,symbol):
     A=ask_filtered[ask_filtered['symbol']==symbol].copy()
     b=bid_filtered[bid_filtered['symbol']==symbol].copy()
     if (len(A)==0) & (len(b)==0):
-        print('symbol '+ symbol +' NOT found')
+        ('symbol '+ symbol +' NOT found')
         
     else:
         #A=A[A['exchange'].isin(exchange)]
@@ -57,24 +57,26 @@ def scan(quote):
     #a.get_tweets()
     return a,df_bid_ex,df_ask_ex,prices 
 @st.cache(allow_output_mutation=True)
-def percentage_stept(df_bid_ex,df_ask_ex,quote,step_percentage,prices ):
+def percentage_stept(df_bid_ex,df_ask_ex,quote,step_percentage,prices,percentage_fromprice ):
     print(quote)
-    df_bid_adjusted,df_ask_adjusted=df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices)
-
+    df_bid_adjusted,df_ask_adjusted=df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,percentage_fromprice)
+    
     return df_bid_adjusted,df_ask_adjusted 
 
 
 a,df_bid_ex,df_ask_ex,prices=scan(quote)
+
 flag=st.button('rescan again')
 if flag==1:
     a,df_bid_ex,df_ask_ex,prices=scan(quote)  
     
 st.balloons()
 percentage=st.number_input('Enter percantage for orderbook aggregation',0.1)
-df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices)
+percentage_fromprice=st.number_input('enter the distance from current price',0.1)
+df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,percentage_fromprice)
 filter=st.text_input('input the minmum aggregated value filter in 4 BTC or 4 USDT','4 BTC')
 
-print(df_bid_adjusted)
+
 f=list(filter.split())
 if f[1]=='BTC':
     BTC_filter=float(f[0])
@@ -82,7 +84,7 @@ if f[1]=='BTC':
 elif f[1]=='USDT':
     USDT_filter=float(f[0])
     ask_filtered,bid_filtered= get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=USDT_filter)
-print(ask_filtered)
+
 temp=pd.concat([ask_filtered,bid_filtered])
 symbols=temp.symbol.unique()
 st.write('Number of symbols detected are ' + str(len(symbols)))

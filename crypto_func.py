@@ -40,11 +40,10 @@ def group_tweets(df_tweet,symbol='BTC',freq='1h'):
               return into,outfrom
           
             
-def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices):      
+def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,percentage_fromprice=100):      
          df_bid_adjusted=pd.DataFrame()
          df_ask_adjusted=pd.DataFrame()
          symbols=df_bid_ex.symbol.unique()
-         print(symbols)
          for symbol in symbols:
                         price=prices[symbol]                    
                             #df_bid,df_ask=calculate_price(df_bid,df_ask,quote)
@@ -57,12 +56,14 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices):
                               mins=price/2
                         step=mins*step_percentage/100
                         if((mins>0) and (step>0) and (maxs>0)):
-                            df_bid=df_bid.groupby(pd.cut(df_bid["bid"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','bid':'mean','amount_BTC':sum,'amount_USDT':sum})
+                            df_bid=df_bid.groupby(pd.cut(df_bid["bid"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','bid':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean'})
                             df_bid['price']=df_bid.index
                         df_bid['symbol']=symbol
                         
                         df_bid_adjusted=pd.concat([df_bid,df_bid_adjusted],ignore_index=True)
-         symbols=df_ask_ex.symbol.unique()                   
+                        df_bid_adjusted=df_bid_adjusted[abs(df_bid_adjusted['price_diff'])<=percentage_fromprice]
+         print(df_bid_adjusted)
+        
          for symbol in symbols:    
                         df_ask=df_ask_ex[df_ask_ex['symbol']==symbol]  
                         price=prices[symbol]                      
@@ -75,12 +76,15 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices):
                             
                         step=mins*step_percentage/100
                         if((mins>0) and (step>0) and (maxs>0)):
-                            df_ask=df_ask.groupby(pd.cut(df_ask["ask"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','ask':'mean','amount_BTC':sum,'amount_USDT':sum})
+                            df_ask=df_ask.groupby(pd.cut(df_ask["ask"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','ask':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean'})
                             df_ask['price']=df_ask.index
                         df_ask['symbol']=symbol
                         df_ask_adjusted=pd.concat([df_ask,df_ask_adjusted],ignore_index=True)
+                        df_ask_adjusted=df_ask_adjusted[-1*(df_ask_adjusted['price_diff'])<=percentage_fromprice]
+
+       
                         
-         return df_bid_adjusted,df_ask_adjusted       
+         return df_bid_adjusted,df_ask_adjusted      
      
 def get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=0):
         ask_filtered=pd.DataFrame()
