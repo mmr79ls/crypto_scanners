@@ -14,12 +14,13 @@ import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,plot_bokeh
 from datetime import datetime
 quote=st.selectbox('Symbol',['USDT','BTC'])
-percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
+#percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
 
-
+percentage=1
 @st.cache(allow_output_mutation=True)
 def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h'):
         a=crypto('binance',quote)  
+        
         df_tweet=a.get_tweets()
         #time_tuple=(2021, 3, 30, 00, 00, 00, 0, 00, 0)
         into,outfrom=group_tweets(df_tweet,coin,tf)
@@ -28,7 +29,7 @@ def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h
 
 time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0)
 coin=st.text_input('Enter the coin you want to check from whale bot','BTC')
-
+print(coin)
 tf=st.text_input('Time frame (1m/1h/4h/1d/1w)','1h')
 OHLCV,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
 
@@ -39,7 +40,7 @@ print(OHLCV.head())
 print(start)
 end = st.text_input("End date",'2021-04-13 14:00:00')
 end=pd.Timestamp(end)
-
+print(end)
 change_low=st.number_input('enter the change in percentage to search for ',-100)
 change_high=st.number_input('enter the change in percentage to search for ',-99)
 
