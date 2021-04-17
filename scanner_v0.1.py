@@ -8,6 +8,7 @@ import numpy as np
 import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,df_adjust_step,get_bidask
 import time
+import datetime
 
 def draw_filtered(ask_filtered,bid_filtered,symbol):
     sns.set(rc={'figure.figsize':(200,150)})
@@ -50,6 +51,9 @@ def scan(quote):
     a=crypto('binance',quote)  
     df_bid_ex,df_ask_ex,prices  =a.scanner()
     print('scan done')
+     
+
+    #dt = datetime.fromordinal(time.time()).strip('YYYY/MM/DD hh:mm')
     st.write('last updated on '+str(time.time()))
     #symbols=a.bid.symbol.unique()
     #time_tuple=(2021, 3, 30, 00, 00, 00, 0, 00, 0)

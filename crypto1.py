@@ -50,9 +50,17 @@ class crypto():
         prices={}   
         df_pairs = pd.DataFrame(getattr(ex, 'fetchMarkets')())
         df=df_pairs[df_pairs.quote==quote]
-        symbols=df.symbol
+        slist=df.symbol
+        symbols=[]
+        for i in slist:
+
+            t=i.find('DOWN/' or 'UP/'or 'BULL/' or 'BEAR/')
+            if(t==-1):
+                symbols.append(i)
+        #symbols=pd.DataFrame(symb)
         if len(symbols)>0:
-          symbol=symbols[symbols.index==symbols.index[-1]].values[0]
+          #symbol=symbols[symbols.index==symbols.index[-1]].values[0]
+          symbol=symbols[-1]
           #flag=valid_check(ex,symbol)
           #if self.flag==flag==1:
           if ex.has['fetchTicker']==True:
@@ -62,33 +70,40 @@ class crypto():
           if self.flag==1:
             
             length=len(symbols)
+            print('Number of symbols are :',length)
             counter=0
             for symbol in symbols:
             #self.flag=valid_check(ex,symbol)
                 time.sleep (ex.rateLimit / 1000) 
-                counter+=1
-                print(counter/length)
+                
                 try:
-                    ex.fetch_ticker(symbol)
-                    orderbook = getattr(ex, 'fetchL2OrderBook')(symbol,10000) 
+                    #ex.fetch_ticker(symbol)
+                    orderbook = getattr(ex, 'fetchL2OrderBook')(symbol,1000) 
                     self.sflag=1              
                 except:
-                  self.sflag=0
+                  orderbook = getattr(ex, 'fetchL2OrderBook')(symbol) 
+                  self.sflag=1      
+                  #self.sflag=0
                 if(self.sflag==1):
-              
+                    print(symbol)
+                    counter+=1
+                    print(counter*100/length)
                     #orderbook = getattr(ex, 'fetchL2OrderBook')(symbol,10000)
                     a=pd.DataFrame(ex.fetch_ticker(symbol))
                     prices[symbol]=a[a.symbol==symbol].close[0]
                     price=a[a.symbol==symbol].close[0]
                     df_ask=pd.DataFrame(orderbook['asks'],columns=['ask','amount'])  
                     df_bid=pd.DataFrame(orderbook['bids'],columns=['bid','amount'])
-                    df_ask['exchange']=id
-                    df_ask['symbol']=symbol
-                    df_bid['exchange']=id
-                    df_bid['symbol']=symbol
-                    df_ask['price'] = a[a.symbol==symbol].close[0]
-                    df_bid['price'] = a[a.symbol==symbol].close[0]
-
+                   #df_ask['exchange']=id
+                    #df_ask['symbol']=symbol
+                    #df_bid['exchange']=id
+                    #df_bid['symbol']=symbol
+                    #df_ask['price'] = a[a.symbol==symbol].close[0]
+                    #df_bid['price'] = a[a.symbol==symbol].close[0]
+                    
+                    added=[id,symbol,a[a.symbol==symbol].close[0]]
+                    df_ask['exchange'],df_ask['symbol'],df_ask['price']=added
+                    df_bid['exchange'],df_bid['symbol'],df_bid['price']=added
                     if(self.quote=='USDT'):
                             df_bid['amount_USDT']=df_bid['amount']*df_bid['bid']
                             df_ask['amount_USDT']=df_ask['amount']*df_ask['ask']
@@ -165,28 +180,43 @@ class crypto():
         exchange=ccxt.binance()
         exchange.load_markets()
         OHLCV=pd.DataFrame()
+        print(OHLCV)
+        print(exchange  )
         if exchange.has['fetchOHLCV']:
             start = time.time()
-            #if(symbol=='all'):
-        
+
             exchanges=exchange.markets
-#F                symbols=exchanges.
-              
             df_pairs = pd.DataFrame(getattr(exchange, 'fetchMarkets')())
             df=df_pairs[df_pairs.quote==self.quote]
             symbols= df.symbol
-           
-           # else:
-               #   symbols=self.symbols  
-           
+            slist=df.symbol
+            symbols=[]
+            for i in slist:
+                t=i.find('DOWN/' or 'UP/' or 'BULL/' or 'BEAR/')
+                if(t==-1):
+                    symbols.append(i)
+            lenght=len(symbols)
+            count=0
             for symbol in symbols:
-               
-                time.sleep (exchange.rateLimit / 700) # time.sleep wants seconds
-                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =10000),columns=['Time','Open','High','Low','Close','Volume'])
+                # time.sleep wants seconds
+                since = exchange.milliseconds () - (40*86400000)
+                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =10000,since=since),columns=['Time','Open','High','Low','Close','Volume'])
                 a['Date']=pd.to_datetime(a['Time']*1000000)
                 a['symbol']=symbol
                 a['change']=self.comp_prev(a)
                 OHLCV=pd.concat([a,OHLCV],ignore_index=True)
+                since = exchange.milliseconds () - (80*86400000)
+                count+=1
+                print(count,'/',lenght)
+                time.sleep (exchange.rateLimit / 2000)
+                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =10000,since=since),columns=['Time','Open','High','Low','Close','Volume'])
+                a['Date']=pd.to_datetime(a['Time']*1000000)
+                a['symbol']=symbol
+                a['change']=self.comp_prev(a)
+                OHLCV=pd.concat([a,OHLCV],ignore_index=True)
+                OHLCV=OHLCV.drop_duplicates()
+                time.sleep (exchange.rateLimit / 2000)
+                
             end=time.time()
             print(exchange,'-',end-start)
             
