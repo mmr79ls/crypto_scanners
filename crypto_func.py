@@ -20,7 +20,7 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume)
             filtered=OHLCV[(OHLCV['Date'] >= start) & (OHLCV['Date'] <= end)]
             print('filtered',len(filtered))
             Volume_filtered=OHLCV[(OHLCV['Date'] >= v_start) & (OHLCV['Date'] <= v_end)]
-            Volume_filtered['Volume']=Volume_filtered.Volume.apply(lambda x : x.replace(',','')).astype('int64')
+            #Volume_filtered['Volume']=Volume_filtered.Volume.apply(lambda x : x.replace(',','')).astype('int64')
             v=Volume_filtered.groupby(['symbol']).agg(old_volume=('Volume',sum))
             v=v[v['old_volume']>volume]
             OHLCV_change=filtered[(filtered['change']>=change_low) & (filtered['change']<=change_high)].sort_values('change')
