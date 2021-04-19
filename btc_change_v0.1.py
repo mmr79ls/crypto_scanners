@@ -36,18 +36,21 @@ OHLCV,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
 start = st.text_input("start date",'2021-04-13 12:00:00')
 #start = datetime.strptime(start, 'yyyy-mm-dd %H:%M:%S')
 start=pd.Timestamp(start)
-print(OHLCV.head())
-print(start)
+
 end = st.text_input("End date",'2021-04-13 14:00:00')
 end=pd.Timestamp(end)
-print(end)
-change_low=st.number_input('enter the change in percentage to search for ',-100)
-change_high=st.number_input('enter the change in percentage to search for ',-99)
 
+change1=st.number_input('enter the change in lower percentage to search for ',-100)
+change2=st.number_input('enter the change in higher percentage to search for ',-99)
+change_low=min(change1,change2)
+change_high=max(change1,change2)
 OHLCV_change=BTC_drop_change(OHLCV,start,end,change_low,change_high)
 st.dataframe(OHLCV_change.set_index('Date'))
 symbol=st.text_input('input the symbol to be checked','BTC/USDT')
 df=OHLCV[OHLCV['symbol']==symbol]
-p=plot_bokeh(into,outfrom,df)
+#p=plot_bokeh(into,outfrom,df)
+
 #st.bokeh_chart(p)
 #show(p)
+
+
