@@ -15,15 +15,14 @@ from bokeh.plotting import figure, output_file, show
 import tweepy
 import re
 
-def BTC_drop_change(OHLCV,start,end,change_low,change_high): 
-            print(start)
-            print(end)
-            print(OHLCV)
-            print(OHLCV.Date)
-            print(start)
+def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume): 
+
             filtered=OHLCV[(OHLCV['Date'] >= start) & (OHLCV['Date'] <= end)]
             print('filtered',len(filtered))
+            Volume_filtered=OHLCV[(OHLCV['Date'] >= v_start) & (OHLCV['Date'] <= v_end)]
+            v=Volume_filtered.groupby(['symbol']).agg(old_volume=('Volumne',sum))
             OHLCV_change=filtered[(filtered['change']>=change_low) & (filtered['change']<=change_high)].sort_values('change')
+            OHLCV_change=OHLCV_change.join(v.set_index('symbol'), on='symbol')
             return OHLCV_change
 
 def group_tweets(df_tweet,symbol='BTC',freq='1h'):
@@ -130,9 +129,16 @@ def plot_bokeh(into,outfrom,df):
               p.triangle(outfrom.index, outfrom.coin_price,name="mycircle",angle =3.14,fill_alpha=0.5,color='green',size=5*outfrom.coin_count/average_out)
               p.triangle(into.index, into.coin_price,name="mycircle",fill_alpha=0.5 ,color='red',size=5*into.coin_count/average_in)
               #labels = LabelSet(x='time', y='coin_price', text='coin_count', level='glyph', x_offset=5, y_offset=5, source=source, render_mode='canvas')
-
+              tooltips=[('price', 'into.coin_price'),('amount', 'into.coin_count')]
+              p.add_tools(HoverTool(tooltips=tooltips))
 
               #p.add_layout(labels)
 
 
               st.bokeh_chart(p)
+     
+def vwap(df):
+    q = df.quantity.values
+    p = df.price.values
+    return df.assign(vwap=(p * q).cumsum() / q.cumsum())
+
