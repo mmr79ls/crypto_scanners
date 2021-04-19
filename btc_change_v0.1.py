@@ -44,9 +44,10 @@ change1=st.number_input('enter the change in lower percentage to search for ',-1
 change2=st.number_input('enter the change in higher percentage to search for ',-99)
 change_low=min(change1,change2)
 change_high=max(change1,change2)
-
-v_start=pd.Timestamp(st.text_input("start date",'2021-04-13 12:00:00'))
-v_end=pd.Timestamp(st.text_input("end date",'2021-04-13 12:00:00'))
+v_start=st.text_input("start date",'2021-04-13 12:00:00')
+v_start=pd.Timestampv_start()
+v_end=st.text_input("end date",'2021-04-13 12:00:00')
+v_end=pd.Timestamp(v_end)
 v_volume_filter=st.number_input('enter the Volume filter')
 OHLCV_change=BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,v_volume_filter)
 st.dataframe(OHLCV_change.set_index('Date'))
