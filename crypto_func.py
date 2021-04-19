@@ -24,7 +24,7 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume)
             v=Volume_filtered.groupby(['symbol']).agg(old_volume=('Volume',sum))
             v=v[v['old_volume']>volume]
             OHLCV_change=filtered[(filtered['change']>=change_low) & (filtered['change']<=change_high)].sort_values('change')
-            OHLCV_change=OHLCV_change.join(v.set_index('symbol'), on='symbol')
+            OHLCV_change=OHLCV_change.join(v, on='symbol')
             return OHLCV_change
 
 def group_tweets(df_tweet,symbol='BTC',freq='1h'):
