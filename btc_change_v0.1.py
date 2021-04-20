@@ -13,6 +13,15 @@ import numpy as np
 import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,plot_bokeh
 from datetime import datetime
+
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 quote=st.selectbox('Symbol',['USDT','BTC'])
 #percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
 
