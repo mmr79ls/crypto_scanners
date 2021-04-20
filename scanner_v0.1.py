@@ -10,6 +10,15 @@ from crypto_func import BTC_drop_change,group_tweets,df_adjust_step,get_bidask
 import time
 import datetime
 
+
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 def draw_filtered(ask_filtered,bid_filtered,symbol):
     sns.set(rc={'figure.figsize':(200,150)})
     A=ask_filtered[ask_filtered['symbol']==symbol].copy()
