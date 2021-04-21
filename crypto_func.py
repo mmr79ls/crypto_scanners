@@ -15,17 +15,35 @@ from bokeh.plotting import figure, output_file, show
 import tweepy
 import re
 
-def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume): 
+def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,vchange_low,vchange_high): 
 
             filtered=OHLCV[(OHLCV['Date'] >= start) & (OHLCV['Date'] <= end)]
             print('filtered',len(filtered))
             Volume_filtered=OHLCV[(OHLCV['Date'] >= v_start) & (OHLCV['Date'] <= v_end)]
-            #Volume_filtered['Volume']=Volume_filtered.Volume.apply(lambda x : x.replace(',','')).astype('int64')
-            v=Volume_filtered.groupby(['symbol']).agg(old_volume=('Volume',sum))
+            v1=filtered.groupby(['symbol']).agg(old_volume=('Volume','mean'))
+            a=Volume_filtered.groupby(['symbol']).agg(new_volume=('Volume','mean'))
+            v=a.join(v1, on='symbol')
             v=v[v['old_volume']>volume]
             OHLCV_change=filtered[(filtered['change']>=change_low) & (filtered['change']<=change_high)].sort_values('change')
             OHLCV_change=OHLCV_change.join(v, on='symbol')
+            OHLCV_change['volume_change']=100*(OHLCV_change['old_volume']-OHLCV_change['new_volume'])/OHLCV_change['new_volume']
+            OHLCV_change=OHLCV_change[(OHLCV_change['volume_change']>=vchange_low) &(OHLCV_change['volume_change']<=vchange_high)]
+           
             return OHLCV_change
+        
+def Volume_change(OHLCV,start1,end1,start2,end2,change1,change2):
+            df11=OHLCV[(OHLCV['Date'] >= start1) & (OHLCV['Date'] <= end1)]
+            df22=OHLCV[(OHLCV['Date'] >= start2) & (OHLCV['Date'] <= end2)]
+            df1=df11.groupby(['symbol']).agg(old_volume=('Volume','mean'))
+            df2=df22.groupby(['symbol']).agg(new_volume=('Volume','mean'))
+            print(df2)
+            df=df1.join(df2, on='symbol')
+            print(df)
+            df['volume_change']=100*(df['old_volume']-df['new_volume'])/df['new_volume']
+            print(df)
+            df=df11.join(df, on='symbol')
+            df=df[(df['volume_change']>=change1) &(df['volume_change']<=change2)]
+            return df
 
 def group_tweets(df_tweet,symbol='BTC',freq='1h'):
               symbol='#'+symbol

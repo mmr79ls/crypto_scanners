@@ -184,7 +184,6 @@ class crypto():
         print(exchange  )
         if exchange.has['fetchOHLCV']:
             start = time.time()
-
             exchanges=exchange.markets
             df_pairs = pd.DataFrame(getattr(exchange, 'fetchMarkets')())
             df=df_pairs[df_pairs.quote==self.quote]
@@ -197,6 +196,7 @@ class crypto():
                     symbols.append(i)
             lenght=len(symbols)
             count=0
+            #symbols=['BTC/USDT']
             for symbol in symbols:
                 # time.sleep wants seconds
                 since = exchange.milliseconds () - (40*86400000)

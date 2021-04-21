@@ -9,8 +9,6 @@ import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,df_adjust_step,get_bidask
 import time
 import datetime
-
-
 hide_streamlit_style = """
 <style>
 #MainMenu {visibility: hidden;}
