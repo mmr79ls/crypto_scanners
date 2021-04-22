@@ -78,6 +78,7 @@ for suspect in suspects.index:
     final=pd.concat([a,final])
 
 st.dataframe(final.sort_values(['count','ratio','sell total'],ascending=False))
-symbol=st.selectbox('Symbol',final.symbol)
+print(final.symbol.unique())
+symbol=st.selectbox('Symbol',final.symbol.unique())
 st.dataframe(raw[raw[symbol]==symbol])
 
