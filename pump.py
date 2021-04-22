@@ -8,7 +8,14 @@ Created on Thu Apr 22 18:15:24 2021
 import ccxt
 import pandas as pd
 import streamlit as st
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
 
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 ex=ccxt.binance()
 ex.load_markets()
 
@@ -71,4 +78,6 @@ for suspect in suspects.index:
     final=pd.concat([a,final])
 
 st.dataframe(final.sort_values(['count','ratio','sell total'],ascending=False))
+symbol=st.selectbox('Symbol',final.symbols)
+st.dataframe(raw[raw[symbol]==symbol])
 
