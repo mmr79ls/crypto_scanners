@@ -85,7 +85,13 @@ for suspect in suspects.index:
     final=pd.concat([a,final])
 
 st.dataframe(final.sort_values(['count','ratio','sell total'],ascending=False))
+raw['Date']=pd.to_datetime(raw['timestamp']*1000000)
+raw=raw.groupby(['symbol','side']).resample('5T', on='Date').sum()
+raw=raw.reset_index()
 print(final.symbol.unique())
 symbol=st.selectbox('Symbol',final.symbol.unique())
 st.dataframe(raw[raw['symbol']==symbol])
-
+raws=raw.pivot(index=["symbol","Date"], columns="side", values="cost")
+z=raws.set_index('Date')
+z[z['symbol']=='VIA/BTC'].plot()
+st.plot(z[z['symbol']=='VIA/BTC'])
