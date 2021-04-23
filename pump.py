@@ -91,6 +91,7 @@ raw=raw.reset_index()
 print(final.symbol.unique())
 symbol=st.selectbox('Symbol',final.symbol.unique())
 st.dataframe(raw[raw['symbol']==symbol])
+print(raw)
 raws=raw.pivot(index=["symbol","Date"], columns="side", values="cost")
 z=raws
 print(z)
