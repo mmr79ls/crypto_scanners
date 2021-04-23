@@ -98,4 +98,5 @@ print(z)
 #.set_index('Date')
 #z['total']=z['buy']+z['sell']
 #z[z['symbol']==symbol].plot()
+st.dataframe(z)
 st.line_chart(z[z['symbol']==symbol])
