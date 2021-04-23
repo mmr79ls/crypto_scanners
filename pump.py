@@ -93,6 +93,7 @@ symbol=st.selectbox('Symbol',final.symbol.unique())
 st.dataframe(raw[raw['symbol']==symbol])
 raws=raw.pivot(index=["symbol","Date"], columns="side", values="cost")
 z=raws
+print(z)
 #.set_index('Date')
 #z['total']=z['buy']+z['sell']
 z[z['symbol']==symbol].plot()
