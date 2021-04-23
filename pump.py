@@ -45,8 +45,10 @@ data=pd.DataFrame()
 order=pd.DataFrame()
 #since = ex.milliseconds () - (m*86400000/24)
 since = st.text_input("start date to check",'2021-04-13 12:00:00')
-since=pd.Timestamp(since)
-sinc=struct_time(since)
+since = ex.parse8601(since)
+#since = '2021-04-13 12:00:00'
+#since=pd.Timestamp(since)
+#int(datetime.timestamp(since))
 
 raw=pd.DataFrame()
 #symbols=['VIA/BTC','SKY/BTC','CDT/BTC']
