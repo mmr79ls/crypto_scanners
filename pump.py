@@ -99,4 +99,4 @@ print(z)
 #z['total']=z['buy']+z['sell']
 #z[z['symbol']==symbol].plot()
 st.dataframe(z)
-st.line_chart(z[z['symbol']==symbol])
+st.line_chart(z[z['symbol']==symbol].reset_index())
