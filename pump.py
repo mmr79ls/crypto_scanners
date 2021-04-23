@@ -4,7 +4,8 @@ Created on Thu Apr 22 18:15:24 2021
 
 @author: mraslan
 """
-
+import time
+from time import struct_time
 import ccxt
 import pandas as pd
 import streamlit as st
