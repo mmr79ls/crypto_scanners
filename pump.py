@@ -37,14 +37,15 @@ for i in s:
             symbols.append(i)
 filters=st.number_input('Enter the filter')
 tf=st.text_input('Enter the time frame  1m,5m,...')
-m=st.number_input('enter the number of hours back')
-m=int(m)
+#m=st.number_input('enter the number of hours back')
+#m=int(m)
 d={}
 data=pd.DataFrame()
 order=pd.DataFrame()
 #since = ex.milliseconds () - (m*86400000/24)
 start = st.text_input("start date to check",'2021-04-13 12:00:00')
-since=pd.Timestamp(start)
+sinc=struct_time(start)
+#since=pd.Timestamp(start)
 raw=pd.DataFrame()
 #symbols=['VIA/BTC','SKY/BTC','CDT/BTC']
 for symbol in symbols:
