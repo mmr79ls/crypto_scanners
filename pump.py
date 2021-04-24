@@ -36,15 +36,20 @@ symbols=[]
 for i in s:
         if i.split('/')[0] not in u:
             symbols.append(i)
-filters=st.number_input('Enter the filter')
-tf=st.text_input('Enter the time frame  1m,5m,...')
-#m=st.number_input('enter the number of hours back')
-#m=int(m)
+filters=st.number_input('Enter the filter',value=5)
+tf=st.text_input('Enter the time frame  1m,5m,...',value='1m')
+
+
+@st.cache(allow_output_mutation=True)
+def query_trade_ohlcv(symbol,since,tf='1m'):
+        a=pd.DataFrame(ex.fetch_trades(symbol,limit=10000))
+        price=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,since=since,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+        return a,price
 d={}
 data=pd.DataFrame()
 order=pd.DataFrame()
 #since = ex.milliseconds () - (m*86400000/24)
-since = st.text_input("start date to check",'2021-04-13 12:00:00')
+since = st.text_input("start date to check",'2021-04-24 00:00:00')
 since = ex.parse8601(since)
 #since = '2021-04-13 12:00:00'
 #since=pd.Timestamp(since)
@@ -55,6 +60,7 @@ raw=pd.DataFrame()
 for symbol in symbols:
     a=pd.DataFrame(ex.fetch_trades(symbol,limit=10000))
     price=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,since=since,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+    
     price['symbol']=symbol
     price['change']=comp_prev(price,1)
     a['symbol']=symbol
@@ -83,14 +89,14 @@ for suspect in suspects.index:
     a=order[order['symbol']==suspect]
     a['count']=suspects[suspect]
     final=pd.concat([a,final])
-final[final]
+
 st.dataframe(final.sort_values(['count','ratio','sell total'],ascending=False))
 raw['Date']=pd.to_datetime(raw['timestamp']*1000000)
 raw=raw.groupby(['symbol','side']).resample('5T', on='Date').sum()
 raw=raw.reset_index()
 print(final.symbol.unique())
 symbol=st.selectbox('Symbol',final.symbol.unique())
-st.dataframe(raw[raw['symbol']==symbol])
+st.dataframe(raw[raw['symbol']==symbol].drop(columns=['timestamp'],axis=1).set_index('Date'))
 print(raw)
 raws=raw.pivot(index=["symbol","Date"], columns="side", values="cost")
 z=raws
@@ -100,7 +106,12 @@ print(z)
 #z[z['symbol']==symbol].plot()
 z=z.reset_index()
 z.set_index('Date',inplace=True)
-st.dataframe(z)
+
 pl=z[z['symbol']==symbol]
 pl.drop(columns=['symbol'],axis=1,inplace=True)
-st.line_chart(pl)
+pl['Total']=pl['buy']+pl['sell']
+#p1=pl.fillna(0)
+#rename(columns={'Date':'index'}).set_index('index')
+fig=pl.plot().get_figure()
+
+st.pyplot(fig)
