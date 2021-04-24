@@ -83,7 +83,7 @@ for suspect in suspects.index:
     a=order[order['symbol']==suspect]
     a['count']=suspects[suspect]
     final=pd.concat([a,final])
-
+final[final]
 st.dataframe(final.sort_values(['count','ratio','sell total'],ascending=False))
 raw['Date']=pd.to_datetime(raw['timestamp']*1000000)
 raw=raw.groupby(['symbol','side']).resample('5T', on='Date').sum()
@@ -101,6 +101,6 @@ print(z)
 z=z.reset_index()
 z.set_index('Date',inplace=True)
 st.dataframe(z)
-z[z['symbol']==symbol].plot()
-fig=z[z['symbol']==symbol].plot()
-st.line_chart(z)
+pl=z[z['symbol']==symbol]
+pl.drop(columns=['symbol'],axis=1,inplace=True)
+st.line_chart(pl)
