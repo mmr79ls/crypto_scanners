@@ -23,7 +23,7 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,
             v1=filtered.groupby(['symbol']).agg(old_volume=('Volume','mean'))
             a=Volume_filtered.groupby(['symbol']).agg(new_volume=('Volume','mean'))
             v=a.join(v1, on='symbol')
-            v=v[v['old_volume']>volume]
+            v=v[v['old_volume']<volume]
             OHLCV_change=filtered[(filtered['change']>=change_low) & (filtered['change']<=change_high)].sort_values('change')
             OHLCV_change=OHLCV_change.join(v, on='symbol')
             OHLCV_change['volume_change']=100*(OHLCV_change['old_volume']-OHLCV_change['new_volume'])/OHLCV_change['new_volume']
@@ -59,7 +59,7 @@ def group_tweets(df_tweet,symbol='BTC',freq='1h'):
               return into,outfrom
           
             
-def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,percentage_fromprice=100):      
+def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percentage_fromprice=100):      
          df_bid_adjusted=pd.DataFrame()
          df_ask_adjusted=pd.DataFrame()
          symbols=df_bid_ex.symbol.unique()
@@ -75,12 +75,16 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,percentage_f
                               mins=price/2
                         step=mins*step_percentage/100
                         if((mins>0) and (step>0) and (maxs>0)):
-                            df_bid=df_bid.groupby(pd.cut(df_bid["bid"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','bid':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean'})
+                            df_bid=df_bid.groupby(pd.cut(df_bid["bid"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','bid':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean','distance_from_max':'mean'})
                             df_bid['price']=df_bid.index
                         df_bid['symbol']=symbol
                         
                         df_bid_adjusted=pd.concat([df_bid,df_bid_adjusted],ignore_index=True)
-                        df_bid_adjusted=df_bid_adjusted[abs(df_bid_adjusted['price_diff'])<=percentage_fromprice]
+                        if flag==1:
+                            df_bid_adjusted=df_bid_adjusted[abs(df_bid_adjusted['price_diff'])<=percentage_fromprice]
+                        elif flag==2:
+                            
+                            df_bid_adjusted=df_bid_adjusted[abs(df_bid_adjusted['distance_from_max'])<=percentage_fromprice]
          print(df_bid_adjusted)
         
          for symbol in symbols:    
@@ -95,13 +99,15 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,percentage_f
                             
                         step=mins*step_percentage/100
                         if((mins>0) and (step>0) and (maxs>0)):
-                            df_ask=df_ask.groupby(pd.cut(df_ask["ask"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','ask':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean'})
+                            df_ask=df_ask.groupby(pd.cut(df_ask["ask"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','ask':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean','distance_from_max':'mean'})
                             df_ask['price']=df_ask.index
                         df_ask['symbol']=symbol
                         df_ask_adjusted=pd.concat([df_ask,df_ask_adjusted],ignore_index=True)
-                        df_ask_adjusted=df_ask_adjusted[-1*(df_ask_adjusted['price_diff'])<=percentage_fromprice]
+                        if flag==1:
+                            df_ask_adjusted=df_ask_adjusted[-1*(df_ask_adjusted['price_diff'])<=percentage_fromprice]
 
-       
+                        elif flag==2:
+                            df_ask_adjusted=df_ask_adjusted[abs(df_ask_adjusted['distance_from_max'])<=percentage_fromprice]
                         
          return df_bid_adjusted,df_ask_adjusted      
      
@@ -162,3 +168,50 @@ def vwap(df):
     p = df.price.values
     return df.assign(vwap=(p * q).cumsum() / q.cumsum())
 
+def pump_prepare(since,tf):
+
+        d={}
+        data=pd.DataFrame()
+        order=pd.DataFrame()
+        #since = ex.milliseconds () - (m*86400000/24)
+        since = st.text_input("start date to check",'2021-04-24 00:00:00')
+        since = ex.parse8601(since)
+        #since = '2021-04-13 12:00:00'
+        #since=pd.Timestamp(since)
+        #int(datetime.timestamp(since))
+        
+        raw=pd.DataFrame()
+        #symbols=['VIA/BTC','SKY/BTC','CDT/BTC']
+        for symbol in symbols:
+            a=pd.DataFrame(ex.fetch_trades(symbol,limit=10000))
+            price=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,since=since,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+            price['symbol']=symbol
+            price['change']=comp_prev(price,1)
+            a['symbol']=symbol
+            raw=pd.concat([a,raw])
+            data=pd.concat([price,data])
+            z=a.groupby('side').amount.sum()[0]/a.groupby('side').amount.sum()[1]
+            y=a[a['side']=='buy'].sort_values('amount',ascending=False).cost.sum()
+            x=a[a['side']=='sell'].sort_values('amount',ascending=False).cost.sum()
+            yy=a[a['side']=='buy'].sort_values('amount',ascending=False).cost.max()
+            xx=a[a['side']=='sell'].sort_values('amount',ascending=False).cost.max()
+            d[symbol]=[z,y,x,yy,xx]
+            a=pd.DataFrame(d)
+            a=a.T
+            a.columns=['ratio','buy total','sell total','buy max','sell max']
+            z=pd.DataFrame(d,columns=['ratio','buy total','sell total','buy max','sell max'])
+            order=pd.concat([a,order])
+        data['Date']=pd.to_datetime(data['Time']*1000000)
+        test=data
+        order['symbol']=order.index
+        order=order.reset_index()
+        order.drop(columns=['index'],axis=1,inplace=True)
+        order=order.drop_duplicates()
+        suspects=test[test['change']>=filters].groupby('symbol').Open.count().sort_values(ascending=False)
+        final=pd.DataFrame()
+        for suspect in suspects.index:
+            a=order[order['symbol']==suspect]
+            a['count']=suspects[suspect]
+            final=pd.concat([a,final])
+        
+        final.drop(columns=['timestamp'],inplace=True)

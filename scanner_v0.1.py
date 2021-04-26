@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 import ccxt
-from crypto1 import crypto
+from crypto2 import crypto
 import pandas as pd
 import streamlit as st
 import numpy as np
@@ -61,16 +61,16 @@ def scan(quote):
      
 
     #dt = datetime.fromordinal(time.time()).strip('YYYY/MM/DD hh:mm')
-    st.write('last updated on '+str(time.time()))
+    #st.write('last updated on '+str(time.time()))
     #symbols=a.bid.symbol.unique()
     #time_tuple=(2021, 3, 30, 00, 00, 00, 0, 00, 0)
     #OHLCV=a.get_OHLCV(time_tuple,'1h')
     #a.get_tweets()
     return a,df_bid_ex,df_ask_ex,prices 
 @st.cache(allow_output_mutation=True)
-def percentage_stept(df_bid_ex,df_ask_ex,quote,step_percentage,prices,percentage_fromprice ):
+def percentage_stept(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percentage_fromprice ):
     print(quote)
-    df_bid_adjusted,df_ask_adjusted=df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,percentage_fromprice)
+    df_bid_adjusted,df_ask_adjusted=df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percentage_fromprice)
     
     return df_bid_adjusted,df_ask_adjusted 
 
@@ -81,13 +81,20 @@ flag=st.button('rescan again')
 if flag==1:
     a,df_bid_ex,df_ask_ex,prices=scan(quote)  
     
-st.balloons()
-percentage=st.number_input('Enter percantage for orderbook aggregation',0.1)
-percentage_fromprice=st.number_input('enter the distance from current price',0.1)
-df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,percentage_fromprice)
+
+percentage=st.number_input('Enter percantage for orderbook aggregation',value=1.1)
+action=st.selectbox('Select the function you want   distance from price/  max price within distance',['distance from price','Max price in distance'])
+if action=='distance from price':
+    percentage_fromprice=st.number_input('enter the distance from current price',value=1000)
+    st.write('You are now checking the Orders within %')
+    df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,1,percentage_fromprice)
+elif action=='Max price in distance':
+    percentage_fromprice=st.number_input('enter the % to search for max order',value=3)
+    st.write('You are now checking the max order within %')
+    df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,2,percentage_fromprice)
+
+
 filter=st.text_input('input the minmum aggregated value filter in 4 BTC or 4 USDT','4 BTC')
-
-
 f=list(filter.split())
 if f[1]=='BTC':
     BTC_filter=float(f[0])
