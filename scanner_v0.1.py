@@ -98,7 +98,7 @@ if action=='distance from price':
         ask_filtered,bid_filtered= get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=USDT_filter)
         
 elif action=='Max price in distance':
-    percentage_fromprice=st.number_input('enter the % to search for max order',value=3)
+    percentage_fromprice=st.number_input('enter the % to search for max order',value=3.5)
     st.write('You are now checking the max order within %')
     df_bid_adjusted,df_ask_adjusted,prices=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,2,percentage_fromprice)
     temp_bid=pd.DataFrame()
