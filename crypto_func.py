@@ -14,6 +14,9 @@ output_notebook(resources=INLINE)
 from bokeh.plotting import figure, output_file, show
 import tweepy
 import re
+from requests import Request, Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+import json
 
 def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,vchange_low,vchange_high): 
 
@@ -84,7 +87,7 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percent
                             df_bid_adjusted=df_bid_adjusted[abs(df_bid_adjusted['price_diff'])<=percentage_fromprice]
                         elif flag==2:
                             
-                            df_bid_adjusted=df_bid_adjusted[abs(df_bid_adjusted['distance_from_max'])<=percentage_fromprice]
+                            df_bid_adjusted=df_bid_adjusted
          print(df_bid_adjusted)
         
          for symbol in symbols:    
@@ -107,9 +110,11 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percent
                             df_ask_adjusted=df_ask_adjusted[-1*(df_ask_adjusted['price_diff'])<=percentage_fromprice]
 
                         elif flag==2:
-                            df_ask_adjusted=df_ask_adjusted[abs(df_ask_adjusted['distance_from_max'])<=percentage_fromprice]
+                            
+                            df_ask_adjusted=df_ask_adjusted
+                            
                         
-         return df_bid_adjusted,df_ask_adjusted      
+         return df_bid_adjusted,df_ask_adjusted ,prices     
      
 def get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=0):
         ask_filtered=pd.DataFrame()
@@ -215,3 +220,30 @@ def pump_prepare(since,tf):
             final=pd.concat([a,final])
         
         final.drop(columns=['timestamp'],inplace=True)
+        
+def get_marketcap():
+        url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+        parameters = {
+          'start':'1',
+          'limit':'5000',
+          'convert':'USD'
+        }
+        headers = {
+          'Accepts': 'application/json',
+          'X-CMC_PRO_API_KEY': '3b6d4be6-4877-4590-8491-7226da4ecc05',
+        }
+
+        session = Session()
+        session.headers.update(headers)
+
+        try:
+          response = session.get(url, params=parameters)
+          data = json.loads(response.text)
+          df=pd.DataFrame(data['data'])
+          #df.quote[0]['BTC']['market_cap']
+          df['market_cap']=df.quote.apply(lambda x : x['USD']['market_cap'])
+          df['Volume']=df.quote.apply(lambda x : x['USD']['volume_24h'])
+          df['price']=df.quote.apply(lambda x : x['USD']['price'])
+        except (ConnectionError, Timeout, TooManyRedirects) as e:
+          print(e)
+        return df
