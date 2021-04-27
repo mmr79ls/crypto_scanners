@@ -70,9 +70,9 @@ def scan(quote):
 @st.cache(allow_output_mutation=True)
 def percentage_stept(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percentage_fromprice ):
     print(quote)
-    df_bid_adjusted,df_ask_adjusted=df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percentage_fromprice)
+    df_bid_adjusted,df_ask_adjusted,prices=df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percentage_fromprice)
     
-    return df_bid_adjusted,df_ask_adjusted 
+    return df_bid_adjusted,df_ask_adjusted ,prices
 
 
 a,df_bid_ex,df_ask_ex,prices=scan(quote)
@@ -87,21 +87,38 @@ action=st.selectbox('Select the function you want   distance from price/  max pr
 if action=='distance from price':
     percentage_fromprice=st.number_input('enter the distance from current price',value=1000)
     st.write('You are now checking the Orders within %')
-    df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,1,percentage_fromprice)
+    df_bid_adjusted,df_ask_adjusted,prices=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,1,percentage_fromprice)
+    filter=st.text_input('input the minmum aggregated value filter in 4 BTC or 4 USDT','4 BTC')
+    f=list(filter.split())
+    if f[1]=='BTC':
+        BTC_filter=float(f[0])
+        ask_filtered,bid_filtered=get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=BTC_filter,USDT=0)
+    elif f[1]=='USDT':
+        USDT_filter=float(f[0])
+        ask_filtered,bid_filtered= get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=USDT_filter)
+        
 elif action=='Max price in distance':
     percentage_fromprice=st.number_input('enter the % to search for max order',value=3)
     st.write('You are now checking the max order within %')
-    df_bid_adjusted,df_ask_adjusted=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,2,percentage_fromprice)
+    df_bid_adjusted,df_ask_adjusted,prices=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,2,percentage_fromprice)
+    temp_bid=pd.DataFrame()
+    temp_ask=pd.DataFrame()
+    df_bid_adjusted=df_bid_adjusted.reset_index()
+    l=df_bid_adjusted.groupby('symbol').amount_BTC.idxmax()
+    df_bid_adjusted=df_bid_adjusted[df_bid_adjusted.index.isin(l)]
+    l=df_ask_adjusted.groupby('symbol').amount_BTC.idxmax()
+    df_ask_adjusted=df_ask_adjusted[df_ask_adjusted.index.isin(l)]
+    ask_filtered=df_ask_adjusted[abs(df_ask_adjusted.price_diff)<percentage_fromprice]
+    bid_filtered=df_bid_adjusted[abs(df_bid_adjusted.price_diff)<percentage_fromprice]
+    st.write('Number of symbols in ask detected are ' + str(len(ask_filtered)))
+    st.write('Number of symbols in bid detected are ' + str(len(bid_filtered)))
+
+    #print(df_ask_adjusted)
+    
+    #print(prices)
+    #PRICE FORMULA PRICES LOOKUP
 
 
-filter=st.text_input('input the minmum aggregated value filter in 4 BTC or 4 USDT','4 BTC')
-f=list(filter.split())
-if f[1]=='BTC':
-    BTC_filter=float(f[0])
-    ask_filtered,bid_filtered=get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=BTC_filter,USDT=0)
-elif f[1]=='USDT':
-    USDT_filter=float(f[0])
-    ask_filtered,bid_filtered= get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=USDT_filter)
 
 temp=pd.concat([ask_filtered,bid_filtered])
 symbols=temp.symbol.unique()
