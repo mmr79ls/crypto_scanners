@@ -115,3 +115,15 @@ pl['Total']=pl['buy']+pl['sell']
 fig=pl.plot().get_figure()
 
 st.pyplot(fig)
+
+test_date = st.text_input("pump time test",'2021-04-24 12:00:00')
+valid_date = st.text_input("pump time validation time",'2021-04-25 17:00:00')
+filter2=st.number_input('filter',3)
+test=data[data['Date']<=valid_date]
+test=test[test['change']>=filter2].groupby('symbol').Open.count().sort_values(ascending=False)
+print(test)
+validate=data[data['Date']>valid_date]
+print(validate[validate.index=='EASY/BTC'])
+validate=validate[validate['symbol'].isin(test.index.unique())].groupby('symbol').agg({'Open':'count','change':['max','sum']})
+st.dataframe(test)
+st.dataframe(validate)

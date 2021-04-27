@@ -117,16 +117,16 @@ class crypto():
                             df_ask['amount_USDT']=df_ask['amount_BTC']/self.btc_usdt
                     df_ask['price_diff']=df_ask.ask.apply(lambda x: (price-x)*100/price)
                     df_bid['price_diff']=df_bid.bid.apply(lambda x: (price-x)*100/price)
-                    if(len(df_bid)==0):
-                         df_bid['distance_from_max']=1000
-                         df_ask['distance_from_max']=1000
-                    else:
-                        bid_max_price=df_bid['amount_BTC'].idxmax()
-                        print(bid_max_price)
-                        ask_max_price=df_ask['amount_BTC'].idxmax()
-                        df_bid['distance_from_max']=(price-df_bid.bid[bid_max_price])*100/price
-                        df_ask['distance_from_max']=(price-df_ask.ask[ask_max_price])*100/price
-                        print(df_ask)
+                    #if(len(df_bid)==0):
+                       #  df_bid['distance_from_max']=1000
+                       #  df_ask['distance_from_max']=1000
+                    #else:
+                       # bid_max_price=df_bid['amount_BTC'].idxmax()
+                        #print(bid_max_price)
+                        #ask_max_price=df_ask['amount_BTC'].idxmax()
+                        #df_bid['distance_from_max']=(price-df_bid.bid[bid_max_price])*100/price
+                        #df_ask['distance_from_max']=(price-df_ask.ask[ask_max_price])*100/price
+                        #print(df_ask)
                         #df_ask['distance_from_max']=df_ask.ask.apply(lambda x: (price-x)*100/price)
                         #df_bid['distance_from_max']=df_bid.bid.apply(lambda x: (price-x)*100/price)
                     df_ask_ex=pd.concat([df_ask,df_ask_ex],ignore_index=True)
