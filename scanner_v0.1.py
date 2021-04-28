@@ -98,7 +98,7 @@ if action=='distance from price':
         ask_filtered,bid_filtered= get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=USDT_filter)
         
 elif action=='Max price in distance':
-    percentage_fromprice=st.number_input('enter the % to search for max order',value=3.5)
+    percentage_fromprice=st.number_input('enter the % to search for max order',value=3)
     st.write('You are now checking the max order within %')
     df_bid_adjusted,df_ask_adjusted,prices=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,2,percentage_fromprice)
     temp_bid=pd.DataFrame()
@@ -112,6 +112,7 @@ elif action=='Max price in distance':
     bid_filtered=df_bid_adjusted[abs(df_bid_adjusted.price_diff)<percentage_fromprice]
     st.write('Number of symbols in ask detected are ' + str(len(ask_filtered)))
     st.write('Number of symbols in bid detected are ' + str(len(bid_filtered)))
+    
 
     #print(df_ask_adjusted)
     
@@ -122,6 +123,8 @@ elif action=='Max price in distance':
 
 temp=pd.concat([ask_filtered,bid_filtered])
 symbols=temp.symbol.unique()
+st.dataframe(temp.set_index('symbol'))
+#t.dataframe(ask_filtered.set_index('symbol'))
 st.write('Number of symbols detected are ' + str(len(symbols)))
 symbol=st.selectbox('Symbol',symbols)
 show=st.button('Show graph')

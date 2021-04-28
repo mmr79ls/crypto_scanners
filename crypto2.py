@@ -72,7 +72,7 @@ class crypto():
             length=len(symbols)
             print('Number of symbols are :',length)
             counter=0
-            #symbols=['BTC/USDT','XRP/USDT','LTC/USDT']
+            symbols=['BTC/USDT','XRP/USDT','LTC/USDT']
             for symbol in symbols:
             #self.flag=valid_check(ex,symbol)
                 time.sleep (ex.rateLimit / 1000) 

@@ -19,8 +19,14 @@ from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 
 def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,vchange_low,vchange_high): 
-
-            filtered=OHLCV[(OHLCV['Date'] >= start) & (OHLCV['Date'] <= end)]
+            ref=OHLCV[OHLCV['Date'] == start]
+            filtered=OHLCV[(OHLCV['Date'] > start) & (OHLCV['Date'] <= end)]
+            l=[]
+            for symbol in ref.symbol:
+                l.append((filtered[filtered['symbol']==symbol].Low.min()-ref[ref['symbol']==symbol].Close.max())*100/ref[ref['symbol']==symbol].Close.max())
+                
+            ref['change']=l
+            filtered=ref
             print('filtered',len(filtered))
             Volume_filtered=OHLCV[(OHLCV['Date'] >= v_start) & (OHLCV['Date'] <= v_end)]
             v1=filtered.groupby(['symbol']).agg(old_volume=('Volume','mean'))
@@ -78,8 +84,8 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percent
                               mins=price/2
                         step=mins*step_percentage/100
                         if((mins>0) and (step>0) and (maxs>0)):
-                            df_bid=df_bid.groupby(pd.cut(df_bid["bid"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','bid':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean','distance_from_max':'mean'})
-                            df_bid['price']=df_bid.index
+                            df_bid=df_bid.groupby(pd.cut(df_bid["bid"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','bid':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean'})
+                            df_bid['price']=df_bid.index.astype('str')
                         df_bid['symbol']=symbol
                         
                         df_bid_adjusted=pd.concat([df_bid,df_bid_adjusted],ignore_index=True)
@@ -102,8 +108,8 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percent
                             
                         step=mins*step_percentage/100
                         if((mins>0) and (step>0) and (maxs>0)):
-                            df_ask=df_ask.groupby(pd.cut(df_ask["ask"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','ask':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean','distance_from_max':'mean'})
-                            df_ask['price']=df_ask.index
+                            df_ask=df_ask.groupby(pd.cut(df_ask["ask"], np.arange(mins, maxs+step, step))).agg({'amount':'sum','ask':'mean','amount_BTC':sum,'amount_USDT':sum,'price_diff':'mean'})
+                            df_ask['price']=df_ask.index.astype('str')
                         df_ask['symbol']=symbol
                         df_ask_adjusted=pd.concat([df_ask,df_ask_adjusted],ignore_index=True)
                         if flag==1:
@@ -114,7 +120,7 @@ def df_adjust_step(df_bid_ex,df_ask_ex,quote,step_percentage,prices,flag,percent
                             df_ask_adjusted=df_ask_adjusted
                             
                         
-         return df_bid_adjusted,df_ask_adjusted ,prices     
+         return df_bid_adjusted,df_ask_adjusted,prices      
      
 def get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=0):
         ask_filtered=pd.DataFrame()
