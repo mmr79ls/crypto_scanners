@@ -18,7 +18,7 @@ from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 
-def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,vchange_low,vchange_high): 
+def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,vchange_low,vchange_high,flag): 
             ref=OHLCV[OHLCV['Date'] == start]
             filtered=OHLCV[(OHLCV['Date'] > start) & (OHLCV['Date'] <= end)]
             l=[]
@@ -28,15 +28,18 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,
             ref['change']=l
             filtered=ref
             print('filtered',len(filtered))
-            Volume_filtered=OHLCV[(OHLCV['Date'] >= v_start) & (OHLCV['Date'] <= v_end)]
-            v1=filtered.groupby(['symbol']).agg(old_volume=('Volume','mean'))
-            a=Volume_filtered.groupby(['symbol']).agg(new_volume=('Volume','mean'))
-            v=a.join(v1, on='symbol')
-            v=v[v['old_volume']<volume]
+         
+            
             OHLCV_change=filtered[(filtered['change']>=change_low) & (filtered['change']<=change_high)].sort_values('change')
-            OHLCV_change=OHLCV_change.join(v, on='symbol')
-            OHLCV_change['volume_change']=100*(OHLCV_change['old_volume']-OHLCV_change['new_volume'])/OHLCV_change['new_volume']
-            OHLCV_change=OHLCV_change[(OHLCV_change['volume_change']>=vchange_low) &(OHLCV_change['volume_change']<=vchange_high)]
+            if flag==1:
+                Volume_filtered=OHLCV[(OHLCV['Date'] >= v_start) & (OHLCV['Date'] <= v_end)]
+                v1=filtered.groupby(['symbol']).agg(old_volume=('Volume','mean'))
+                a=Volume_filtered.groupby(['symbol']).agg(new_volume=('Volume','mean'))
+                v=a.join(v1, on='symbol')
+                #v=v[v['old_volume']<volume]
+                OHLCV_change=OHLCV_change.join(v, on='symbol')
+                OHLCV_change['volume_change']=100*(OHLCV_change['old_volume']-OHLCV_change['new_volume'])/OHLCV_change['new_volume']
+                OHLCV_change=OHLCV_change[(OHLCV_change['volume_change']>=vchange_low) &(OHLCV_change['volume_change']<=vchange_high)]
            
             return OHLCV_change
         
