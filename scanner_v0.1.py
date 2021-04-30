@@ -9,6 +9,7 @@ import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,df_adjust_step,get_bidask
 import time
 import datetime
+from streamlit import caching
 hide_streamlit_style = """
 <style>
 #MainMenu {visibility: hidden;}
@@ -79,6 +80,7 @@ a,df_bid_ex,df_ask_ex,prices=scan(quote)
 
 flag=st.button('rescan again')
 if flag==1:
+     caching.clear_cache()
     a,df_bid_ex,df_ask_ex,prices=scan(quote)  
     
 
