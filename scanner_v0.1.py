@@ -81,7 +81,7 @@ a,df_bid_ex,df_ask_ex,prices=scan(quote)
 flag=st.button('rescan again')
 if flag==1:
      caching.clear_cache()
-    a,df_bid_ex,df_ask_ex,prices=scan(quote)  
+     a,df_bid_ex,df_ask_ex,prices=scan(quote)  
     
 
 percentage=st.number_input('Enter percantage for orderbook aggregation',value=1.1)
