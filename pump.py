@@ -111,8 +111,8 @@ print(final)
 action=st.selectbox('volume filter',['yes','no'])
 if action=='yes':
     
-    change_buysell1=st.number_input('% buy/sell',value=0)
-    change_buysell2=st.number_input('% buy/sell',value=1000000)
+    change_buysell1=st.number_input('% buy/sell',value=0.0)
+    change_buysell2=st.number_input('% buy/sell',value=1000000.0)
     
     f1=final[(final['buysell_ratio']<max(change_buysell1,change_buysell2)) & (final['buysell_ratio']>min(change_buysell1,change_buysell2))]
     st.dataframe(f1)
