@@ -102,7 +102,7 @@ start=st.text_input('start time','2021-05-01 08:00:00')
 sampling=st.text_input('resolution 1T,5T,1h      T=mins',value='1T')
 change=st.number_input('% to filter on change of price',value=3)
 #df=get_marketcap()
-df=pd.DataFrame()
+df=pd.read_csv('market_cap.csv')
 merged=search_pump(sampling,start)
 print(merged)  
 merged['coin']=merged.symbol.apply(lambda x : x.split('/')[0])
@@ -119,16 +119,18 @@ if action=='yes':
     
     f1=final[(final['buysell_to_vol%']<max(change_buysell1,change_buysell2)) & (final['buysell_to_vol%']>min(change_buysell1,change_buysell2))]
     st.dataframe(f1)
-    f2=f1.groupby('symbol').agg({'buysell_to_vol%':'count' }).merge(final.groupby('symbol').agg({'cost_buy':'sum','cost_sell':'sum','vol':'sum','buysell_to_vol%':'mean','buysell_difference':'sum'}),on='symbol')
+    f2=f1.groupby('symbol').agg({'buysell_to_vol%':'count' }).merge(final.groupby('symbol').agg({'cost_buy':'sum','cost_sell':'sum','vol':'sum','buysell_difference':'sum'}),on='symbol')
     f2['buysell_ratio%']=f2.cost_buy/f2.cost_sell
+    f2['buysell_to_vol%_actual']=f2.buysell_difference/f2.vol
     #f2=f1.groupby('symbol').agg({'change':'mean','cost_buy':'sum','cost_sell':   'sum','vol':'sum' })
     #f2['change']=f2.cost_buy/f2.cost_sell
     st.dataframe(f2)
 elif action=='no':
     f=final[final['change']>change]
     st.dataframe(f)
-    f2=f.groupby('symbol').agg({'change':'count' }).merge(final.groupby('symbol').agg({'cost_buy':'sum','cost_sell':'sum','vol':'sum','buysell_to_vol%':'mean','buysell_difference':'sum'}),on='symbol')
+    f2=f.groupby('symbol').agg({'change':'count' }).merge(final.groupby('symbol').agg({'cost_buy':'sum','cost_sell':'sum','vol':'sum','buysell_difference':'sum'}),on='symbol')
     f2['buysell_ratio%']=f2.cost_buy/f2.cost_sell
+    f2['buysell_to_vol%_actual']=f2.buysell_difference/f2.vol
     st.dataframe(f2)
     print(f2)
     
