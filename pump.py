@@ -81,6 +81,9 @@ def search_pump(sampling,start):
         new['spread_change']=raw_all['spread_change']
         new['buysell_ratio']=raw_all['buysell_ratio']
         new['vol']=raw_all['vol']
+        new['buysell_difference']=raw_all['buysell_difference']
+        
+        new['buysell_to_vol%']=raw_all['buysell_to_vol%']
         new.index=raw_all.index
         raw_all=new.drop_duplicates()
         data_all=data_all.drop_duplicates()
