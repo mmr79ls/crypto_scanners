@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Apr 22 18:15:24 2021
+Created on Fri Apr 30 23:35:02 2021
 
 @author: mraslan
 """
-import time
-from time import struct_time
+
 import ccxt
 import pandas as pd
+from crypto_func import *
+from crypto2 import crypto
 import streamlit as st
+import numpy as np
 hide_streamlit_style = """
 <style>
 #MainMenu {visibility: hidden;}
@@ -17,113 +19,112 @@ footer {visibility: hidden;}
 
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
-ex=ccxt.binance()
-ex.load_markets()
 
-symbols=ex.symbols
+#symbols=ex.symbols
 def comp_prev(a,shift=1):
-    return (a.High-a.Low)*100/a.High
-s=[]
-u=[]
-for symbol in symbols:
-    if symbol.split('/')[1]=='BTC':
-        s.append(symbol)
-    if symbol.split('/')[1]=='USDT':
-        u.append(symbol.split('/')[0])
-
-#since=since = ex.milliseconds () - (75*86380000)
-symbols=[]
-for i in s:
-        if i.split('/')[0] not in u:
-            symbols.append(i)
-filters=st.number_input('Enter the filter',value=5)
-tf=st.text_input('Enter the time frame  1m,5m,...',value='1m')
+    return (a.High-a.Close.shift(shift))*100/a.Close.shift(shift)#a.High
 
 
 @st.cache(allow_output_mutation=True)
-def query_trade_ohlcv(symbol,since,tf='1m'):
-        a=pd.DataFrame(ex.fetch_trades(symbol,limit=10000))
-        price=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,since=since,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
-        return a,price
-d={}
-data=pd.DataFrame()
-order=pd.DataFrame()
-#since = ex.milliseconds () - (m*86400000/24)
-since = st.text_input("start date to check",'2021-04-24 00:00:00')
-since = ex.parse8601(since)
-#since = '2021-04-13 12:00:00'
-#since=pd.Timestamp(since)
-#int(datetime.timestamp(since))
+def get_marketcap():
+            df=get_marketcap()
+            
+            df['coin']=df['symbol']
+            df.drop(columns='symbol',axis=1,inplace=True)
+            cols=['coin','date_added','max_supply','circulating_supply','total_supply','market_cap','Volume24h','price']
+            df=pd.DataFrame(df,columns=cols)
+            df.set_index('coin',inplace=True)
+            print('market')
+            return df
 
-raw=pd.DataFrame()
-#symbols=['VIA/BTC','SKY/BTC','CDT/BTC']
-for symbol in symbols:
-    a=pd.DataFrame(ex.fetch_trades(symbol,limit=10000))
-    price=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,since=since,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+@st.cache(allow_output_mutation=True)
+def search_pump(sampling,start):
+        
+        raw_all=pd.DataFrame()
+        price_all=pd.DataFrame()
+        data_all=pd.DataFrame()
+        s=[]
+        u=[]
+        ex=ccxt.binance()
+        ex.load_markets()
+        f=pd.DataFrame(ex.fetch_markets())
+        symbols=f[f['active']==True].symbol.unique()
+        for symbol in symbols:
+            if symbol.split('/')[1]=='BTC':
+                s.append(symbol)
+            if symbol.split('/')[1]=='USDT':
+                u.append(symbol.split('/')[0])
+        
+        #since=since = ex.milliseconds () - (75*86380000)
+        symbols=[]
+        for i in s:
+                if i.split('/')[0] not in u:
+                    symbols.append(i)
+       
+        for symbol in symbols:
+            #print(symbol)
+            raw,data,price=get_trades(ex,symbol,sampling,start)
+            raw_all=pd.concat([raw,raw_all],ignore_index=True)
+            price_all=pd.concat([price,price_all],ignore_index=True)
+            data_all=pd.concat([data,data_all],ignore_index=True)
+        raw_all.set_index('datetime',inplace=True)
+        raw_all=raw_all.sort_values('datetime')
+        price_all['Time']=pd.to_datetime(price_all['Time']*1000000)
+        data_all.set_index('Date',inplace=True)
+        new=pd.DataFrame()
+        new['symbol']=raw_all['symbol']
+        new['price_buy']=raw_all['price']['buy']
+        new['cost_buy']=raw_all['cost']['buy']
+        new['price_sell']=raw_all['price']['sell']
+        new['cost_sell']=raw_all['cost']['sell']
+        new['spread']=raw_all['spread']
+        new['spread_change']=raw_all['spread_change']
+        new['buysell_ratio']=raw_all['buysell_ratio']
+        new['vol']=raw_all['vol']
+        new.index=raw_all.index
+        raw_all=new.drop_duplicates()
+        data_all=data_all.drop_duplicates()
+        new=[]
+        raw_all=raw_all.reset_index()
+        data_all=data_all.reset_index()
+        raw_all['datetime']=pd.to_datetime(raw_all['datetime'], utc = True)
+        data_all['Date']=pd.to_datetime(data_all['Date'], utc = True)
+        merged=pd.merge(data_all, raw_all,  how='left', left_on=['Date','symbol'], right_on = ['datetime','symbol'])
+        
+        #merged=merged[merged['Date']>=pd.to_datetime(t, utc = True)[0]]
+        print(merged)        
+        return merged
+
+start=st.text_input('start time','2021-05-01 08:00:00')
+sampling=st.text_input('resolution 1T,5T,1h      T=minuites',value='1T')
+change=st.number_input('% to filter on change of price',value=3)
+#df=get_marketcap()
+df=pd.DataFrame()
+merged=search_pump(sampling,start)
+print(merged)  
+merged['coin']=merged.symbol.apply(lambda x : x.split('/')[0])
+merged.set_index('coin',inplace=True)
+final=merged.drop(columns=['Time','Open','Close','High','Low','datetime']).reset_index()
+print(final)
+#.join(df)
+
+action=st.selectbox('volume filter',['yes','no'])
+if action=='yes':
     
-    price['symbol']=symbol
-    price['change']=comp_prev(price,1)
-    a['symbol']=symbol
-    raw=pd.concat([a,raw])
-    data=pd.concat([price,data])
-    z=a.groupby('side').amount.sum()[0]/a.groupby('side').amount.sum()[1]
-    y=a[a['side']=='buy'].sort_values('amount',ascending=False).cost.sum()
-    x=a[a['side']=='sell'].sort_values('amount',ascending=False).cost.sum()
-    yy=a[a['side']=='buy'].sort_values('amount',ascending=False).cost.max()
-    xx=a[a['side']=='sell'].sort_values('amount',ascending=False).cost.max()
-    d[symbol]=[z,y,x,yy,xx]
-    a=pd.DataFrame(d)
-    a=a.T
-    a.columns=['ratio','buy total','sell total','buy max','sell max']
-    z=pd.DataFrame(d,columns=['ratio','buy total','sell total','buy max','sell max'])
-    order=pd.concat([a,order])
-data['Date']=pd.to_datetime(data['Time']*1000000)
-test=data
-order['symbol']=order.index
-order=order.reset_index()
-order.drop(columns=['index'],axis=1,inplace=True)
-order=order.drop_duplicates()
-suspects=test[test['change']>=filters].groupby('symbol').Open.count().sort_values(ascending=False)
-final=pd.DataFrame()
-for suspect in suspects.index:
-    a=order[order['symbol']==suspect]
-    a['count']=suspects[suspect]
-    final=pd.concat([a,final])
-
-st.dataframe(final.sort_values(['count','ratio','sell total'],ascending=False))
-raw['Date']=pd.to_datetime(raw['timestamp']*1000000)
-raw=raw.groupby(['symbol','side']).resample('5T', on='Date').sum()
-raw=raw.reset_index()
-print(final.symbol.unique())
-symbol=st.selectbox('Symbol',final.symbol.unique())
-st.dataframe(raw[raw['symbol']==symbol].drop(columns=['timestamp'],axis=1).set_index('Date'))
-print(raw)
-raws=raw.pivot(index=["symbol","Date"], columns="side", values="cost")
-z=raws
-print(z)
-#.set_index('Date')
-#z['total']=z['buy']+z['sell']
-#z[z['symbol']==symbol].plot()
-z=z.reset_index()
-z.set_index('Date',inplace=True)
-
-pl=z[z['symbol']==symbol]
-pl.drop(columns=['symbol'],axis=1,inplace=True)
-pl['Total']=pl['buy']+pl['sell']
-#p1=pl.fillna(0)
-#rename(columns={'Date':'index'}).set_index('index')
-fig=pl.plot().get_figure()
-
-st.pyplot(fig)
-
-test_date = st.text_input("pump time test",'2021-04-24 12:00:00')
-valid_date = st.text_input("pump time validation time",'2021-04-25 17:00:00')
-filter2=st.number_input('filter',3)
-test=data[data['Date']<=valid_date]
-test=test[test['change']>=filter2].groupby('symbol').Open.count().sort_values(ascending=False)
-print(test)
-validate=data[data['Date']>valid_date]
-print(validate[validate.index=='EASY/BTC'])
-validate=validate[validate['symbol'].isin(test.index.unique())].groupby('symbol').agg({'Open':'count','change':['max','sum']})
-st.dataframe(test)
-st.dataframe(validate)
+    change_buysell1=st.number_input('% buy/sell',value=0)
+    change_buysell2=st.number_input('% buy/sell',value=1000000)
+    
+    f1=final[(final['buysell_ratio']<max(change_buysell1,change_buysell2)) & (final['buysell_ratio']>min(change_buysell1,change_buysell2))]
+    st.dataframe(f1)
+    f2=f1.groupby('symbol').agg({'buysell_ratio':'count' }).merge(final.groupby('symbol').agg({'cost_buy':'sum','cost_sell':'sum','vol':'sum'}),on='symbol')
+    #f2=f1.groupby('symbol').agg({'change':'mean','cost_buy':'sum','cost_sell':   'sum','vol':'sum' })
+    #f2['change']=f2.cost_buy/f2.cost_sell
+    st.dataframe(f2)
+elif action=='no':
+    f=final[final['change']>change]
+    st.dataframe(f)
+    f2=f.groupby('symbol').agg({'change':'count' }).merge(final.groupby('symbol').agg({'cost_buy':'sum','cost_sell':'sum','vol':'sum'}),on='symbol')
+    f2['buysell_ratio']=f2.cost_buy/f2.cost_sell
+    st.dataframe(f2)
+    print(f2)
+    

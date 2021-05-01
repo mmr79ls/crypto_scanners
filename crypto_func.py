@@ -17,6 +17,10 @@ import re
 from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
+from requests import Request, Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+import json
+import pandas as pd
 
 def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,vchange_low,vchange_high,flag): 
             ref=OHLCV[OHLCV['Date'] == start]
@@ -230,6 +234,7 @@ def pump_prepare(since,tf):
         
         final.drop(columns=['timestamp'],inplace=True)
         
+
 def get_marketcap():
         url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
         parameters = {
@@ -251,8 +256,79 @@ def get_marketcap():
           df=pd.DataFrame(data['data'])
           #df.quote[0]['BTC']['market_cap']
           df['market_cap']=df.quote.apply(lambda x : x['USD']['market_cap'])
-          df['Volume']=df.quote.apply(lambda x : x['USD']['volume_24h'])
+          df['Volume24h']=df.quote.apply(lambda x : x['USD']['volume_24h'])
           df['price']=df.quote.apply(lambda x : x['USD']['price'])
         except (ConnectionError, Timeout, TooManyRedirects) as e:
           print(e)
         return df
+def ohlcv(ex,since,symbol,data):
+        price=pd.DataFrame(ex.fetch_ohlcv(symbol,'1m',since=since,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+        price['symbol']=symbol
+        price['change']=comp_prev(price,1)
+        data=pd.concat([price,data])
+        return data,price
+def comp_prev(a,shift=1):
+    return (a.High-a.Close.shift(shift))*100/a.Close.shift(shift)#a.High
+
+def comp_prev_spread(a,shift=1):
+        return (a.spread-a.spread.shift(shift))*100/a.spread
+
+def time_dif(start):
+    return start+pd.to_timedelta("1h")
+
+
+def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
+    raw_symbol=pd.DataFrame()
+    data=pd.DataFrame()
+   
+    #symbol='POLY/BTC'
+
+    start='2021-05-01 08:00:00'
+   
+    since = ex.parse8601(start)
+    a=trades(ex,symbol,since)
+    #a['symbol']=symbol
+    a.set_index('datetime',inplace=True)
+    a.index=pd.to_datetime(a.index)
+    z=a.groupby(['symbol','side']).resample(sampling).agg({'price':'mean','amount':'sum','cost':'sum'}).reset_index()
+    raw=z.pivot(index=['symbol','datetime'], columns='side', values=['price','cost']).reset_index()
+    raw=raw.fillna(0)
+    #raw['price']['buy']=raw['price']['buy'].apply(lambda x : x.shift(1) if x==0 else x )
+    #raw['price']['sell']=raw['price']['sell'].apply(lambda x : x.shift(1) if x==0 else x )
+    
+    raw['spread']=raw['price']['sell']-raw['price']['buy']
+    raw['spread_change']=comp_prev_spread(raw,1)
+    raw['buysell_ratio']=raw['cost']['buy']/raw['cost']['sell']
+    raw['vol']=raw['cost']['buy']+raw['cost']['sell']
+    raw_symbol=pd.concat([raw,raw_symbol],ignore_index=True)
+    raw_symbol.replace(np.inf, 0, inplace=True)
+    raw_symbol.replace(np.NINF, 0, inplace=True)
+    data,price=ohlcv(ex,since,symbol,data)
+    data['Date']=pd.to_datetime(data['Time']*1000000)
+    if len(raw_symbol[raw_symbol['spread_change']>100])>0:
+        print(symbol,raw_symbol[raw_symbol['spread_change']>1000].spread_change.count())
+    
+    return raw_symbol,data,price
+
+
+
+def trades(ex,symbol,since):
+        #since = ex.parse8601(since)
+        all_orders = []
+        s=[]
+        while since < ex.milliseconds ()-(1000*60*15):
+            symbol = symbol  # change for your symbol
+            #limit = 20  # change for your limit
+        
+            orders =  ex.fetch_trades(symbol, since)
+            s.append(since)
+            print(since)
+            if len(orders):
+                since =  orders[len(orders) - 1]['timestamp']
+                all_orders += orders
+                #print(all_orders[-1])
+            elif(s[-1]==s[-2]):
+                    break
+        orders=pd.DataFrame(all_orders)
+        orders['symbol']=symbol
+        return orders
