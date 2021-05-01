@@ -288,7 +288,9 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
     since = ex.parse8601(start)
     a=trades(ex,symbol,since)
     #a['symbol']=symbol
+    a.datetime.sort_values()
     a.set_index('datetime',inplace=True)
+    
     a.index=pd.to_datetime(a.index)
     z=a.groupby(['symbol','side']).resample(sampling).agg({'price':'mean','amount':'sum','cost':'sum'}).reset_index()
     raw=z.pivot(index=['symbol','datetime'], columns='side', values=['price','cost']).reset_index()
@@ -297,7 +299,7 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
     #raw['price']['sell']=raw['price']['sell'].apply(lambda x : x.shift(1) if x==0 else x )
     
     raw['spread']=raw['price']['sell']-raw['price']['buy']
-    raw['spread_change']=comp_prev_spread(raw,1)
+    raw['spread_change']=comp_prev_spread(raw,2)
     raw['buysell_ratio']=raw['cost']['buy']/raw['cost']['sell']
     raw['vol']=raw['cost']['buy']+raw['cost']['sell']
     raw_symbol=pd.concat([raw,raw_symbol],ignore_index=True)
@@ -306,7 +308,14 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
     data,price=ohlcv(ex,since,symbol,data)
     data['Date']=pd.to_datetime(data['Time']*1000000)
     if len(raw_symbol[raw_symbol['spread_change']>100])>0:
-        print(symbol,raw_symbol[raw_symbol['spread_change']>1000].spread_change.count())
+        print('more buy')
+        print(symbol,raw_symbol[raw_symbol['buysell_ratio']>1].spread_change.count())
+        print('more sell')
+        print(symbol,raw_symbol[raw_symbol['buysell_ratio']<0.5].spread_change.count())
+        print('large orders')
+        #print(symbol,raw_symbol[raw_symbol['cost']['sell']].max())
+        #print(symbol,raw_symbol[raw_symbol['cost']['buy']].max())
+        
     
     return raw_symbol,data,price
 
@@ -322,7 +331,7 @@ def trades(ex,symbol,since):
         
             orders =  ex.fetch_trades(symbol, since)
             s.append(since)
-            print(since)
+            print(pd.to_datetime(since)*1000000)
             if len(orders):
                 since =  orders[len(orders) - 1]['timestamp']
                 all_orders += orders

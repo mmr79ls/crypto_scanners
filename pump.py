@@ -117,6 +117,7 @@ if action=='yes':
     f1=final[(final['buysell_ratio']<max(change_buysell1,change_buysell2)) & (final['buysell_ratio']>min(change_buysell1,change_buysell2))]
     st.dataframe(f1)
     f2=f1.groupby('symbol').agg({'buysell_ratio':'count' }).merge(final.groupby('symbol').agg({'cost_buy':'sum','cost_sell':'sum','vol':'sum'}),on='symbol')
+    f2['buysell_ratio%']=f2.cost_buy/f2.cost_sell
     #f2=f1.groupby('symbol').agg({'change':'mean','cost_buy':'sum','cost_sell':   'sum','vol':'sum' })
     #f2['change']=f2.cost_buy/f2.cost_sell
     st.dataframe(f2)
@@ -124,7 +125,7 @@ elif action=='no':
     f=final[final['change']>change]
     st.dataframe(f)
     f2=f.groupby('symbol').agg({'change':'count' }).merge(final.groupby('symbol').agg({'cost_buy':'sum','cost_sell':'sum','vol':'sum'}),on='symbol')
-    f2['buysell_ratio']=f2.cost_buy/f2.cost_sell
+    f2['buysell_ratio%']=f2.cost_buy/f2.cost_sell
     st.dataframe(f2)
     print(f2)
     
