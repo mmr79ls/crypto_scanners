@@ -331,7 +331,7 @@ def trades(ex,symbol,since):
         
             orders =  ex.fetch_trades(symbol, since)
             s.append(since)
-            print(pd.to_datetime(since)*1000000)
+            print(ex.parse8601(since))
             if len(orders):
                 since =  orders[len(orders) - 1]['timestamp']
                 all_orders += orders
