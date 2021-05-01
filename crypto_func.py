@@ -311,9 +311,9 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
     data['Date']=pd.to_datetime(data['Time']*1000000)
     if len(raw_symbol[raw_symbol['spread_change']>100])>0:
         print('more buy')
-        print(symbol,raw_symbol[raw_symbol['buysell_to_vol']>1].spread_change.count())
+        print(symbol,raw_symbol[raw_symbol['buysell_to_vol%']>1].spread_change.count())
         print('more sell')
-        print(symbol,raw_symbol[raw_symbol['buysell_to_vol']<0.5].spread_change.count())
+        print(symbol,raw_symbol[raw_symbol['buysell_to_vol%']<0.5].spread_change.count())
         print('large orders')
         #print(symbol,raw_symbol[raw_symbol['cost']['sell']].max())
         #print(symbol,raw_symbol[raw_symbol['cost']['buy']].max())
