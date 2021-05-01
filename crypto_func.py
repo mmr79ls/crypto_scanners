@@ -301,7 +301,9 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
     raw['spread']=raw['price']['sell']-raw['price']['buy']
     raw['spread_change']=comp_prev_spread(raw,2)
     raw['buysell_ratio']=raw['cost']['buy']/raw['cost']['sell']
+    raw['buysell_difference']=raw['cost']['buy']-raw['cost']['sell']
     raw['vol']=raw['cost']['buy']+raw['cost']['sell']
+    raw['buysell_to_vol%']=raw['buysell_difference']/raw['vol']
     raw_symbol=pd.concat([raw,raw_symbol],ignore_index=True)
     raw_symbol.replace(np.inf, 0, inplace=True)
     raw_symbol.replace(np.NINF, 0, inplace=True)
