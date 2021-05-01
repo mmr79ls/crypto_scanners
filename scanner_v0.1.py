@@ -10,6 +10,8 @@ from crypto_func import BTC_drop_change,group_tweets,df_adjust_step,get_bidask
 import time
 import datetime
 from streamlit import caching
+
+
 hide_streamlit_style = """
 <style>
 #MainMenu {visibility: hidden;}
@@ -80,8 +82,8 @@ a,df_bid_ex,df_ask_ex,prices=scan(quote)
 
 flag=st.button('rescan again')
 if flag==1:
-     caching.clear_cache()
-     a,df_bid_ex,df_ask_ex,prices=scan(quote)  
+    caching.clear_cache()
+    a,df_bid_ex,df_ask_ex,prices=scan(quote)  
     
 
 percentage=st.number_input('Enter percantage for orderbook aggregation',value=1.1)
@@ -98,6 +100,16 @@ if action=='distance from price':
     elif f[1]=='USDT':
         USDT_filter=float(f[0])
         ask_filtered,bid_filtered= get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=USDT_filter)
+    temp=pd.concat([ask_filtered,bid_filtered])
+    symbols=temp.symbol.unique()
+    st.dataframe(temp.set_index('symbol'))
+    #t.dataframe(ask_filtered.set_index('symbol'))
+    st.write('Number of symbols detected are ' + str(len(symbols)))
+    symbol=st.selectbox('Symbol',symbols)
+    show=st.button('Show graph')
+    if show:
+        fig=draw_filtered(ask_filtered,bid_filtered,symbol)
+        st.pyplot(fig)    
         
 elif action=='Max price in distance':
     percentage_fromprice=st.number_input('enter the % to search for max order',value=3)
@@ -114,7 +126,18 @@ elif action=='Max price in distance':
     bid_filtered=df_bid_adjusted[abs(df_bid_adjusted.price_diff)<percentage_fromprice]
     st.write('Number of symbols in ask detected are ' + str(len(ask_filtered)))
     st.write('Number of symbols in bid detected are ' + str(len(bid_filtered)))
+    temp=pd.concat([ask_filtered,bid_filtered])
+    symbols=temp.symbol.unique()
+    st.dataframe(temp.set_index('symbol'))
+    #t.dataframe(ask_filtered.set_index('symbol'))
+    st.write('Number of symbols detected are ' + str(len(symbols)))
+    symbol=st.selectbox('Symbol',symbols)
+    show=st.button('Show graph')
+    if show:
+        fig=draw_filtered(ask_filtered,bid_filtered,symbol)
+        st.pyplot(fig)
     
+
 
     #print(df_ask_adjusted)
     
@@ -123,16 +146,7 @@ elif action=='Max price in distance':
 
 
 
-temp=pd.concat([ask_filtered,bid_filtered])
-symbols=temp.symbol.unique()
-st.dataframe(temp.set_index('symbol'))
-#t.dataframe(ask_filtered.set_index('symbol'))
-st.write('Number of symbols detected are ' + str(len(symbols)))
-symbol=st.selectbox('Symbol',symbols)
-show=st.button('Show graph')
-if show:
-    fig=draw_filtered(ask_filtered,bid_filtered,symbol)
-    st.pyplot(fig)
+
 #start=st.date_input('select the start Date')
 #end=st.date_input('select the End Date')
 #start_time=st.time_input('select start time')
