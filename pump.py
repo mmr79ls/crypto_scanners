@@ -96,7 +96,7 @@ def search_pump(sampling,start):
         return merged
 
 start=st.text_input('start time','2021-05-01 08:00:00')
-sampling=st.text_input('resolution 1T,5T,1h      T=minuites',value='1T')
+sampling=st.text_input('resolution 1T,5T,1h      T=mins',value='1T')
 change=st.number_input('% to filter on change of price',value=3)
 #df=get_marketcap()
 df=pd.DataFrame()
