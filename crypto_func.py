@@ -268,7 +268,7 @@ def ohlcv(ex,since,symbol,data):
         data=pd.concat([price,data])
         return data,price
 def comp_prev(a,shift=1):
-    return (a.Low-a.Close.shift(shift))*100/a.Close.shift(shift)#a.High
+    return (a.High-a.Close.shift(shift))*100/a.Close.shift(shift)#a.High
 
 def comp_prev_spread(a,shift=1):
         return (a.spread-a.spread.shift(shift))*100/a.spread
@@ -327,7 +327,6 @@ def trades(ex,symbol,since):
         #since = ex.parse8601(since)
         all_orders = []
         s=[]
-        g=0
         while since < ex.milliseconds ()-(1000*60*15):
             symbol = symbol  # change for your symbol
             #limit = 20  # change for your limit
@@ -337,11 +336,6 @@ def trades(ex,symbol,since):
             print(ex.parse8601(since))
             if len(orders):
                 since =  orders[len(orders) - 1]['timestamp']
-                if(g>0):
-                    if since==(all_orders[len(orders) - 1]['timestamp']):
-                        since=ex.milliseconds()
-                        break
-                g+=1
                 all_orders += orders
                 #print(all_orders[-1])
             elif(s[-1]==s[-2]):
