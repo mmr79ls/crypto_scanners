@@ -62,6 +62,8 @@ def search_pump(sampling,start):
                     symbols.append(i)
        
         for symbol in symbols:
+            if symbol=='RENBTC/BTC':
+                continue
             #print(symbol)
             raw,data,price=get_trades(ex,symbol,sampling,start)
             raw_all=pd.concat([raw,raw_all],ignore_index=True)
