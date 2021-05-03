@@ -87,7 +87,7 @@ if flag==1:
     
 
 percentage=st.number_input('Enter percantage for orderbook aggregation',value=1.1)
-action=st.selectbox('Select the function you want   distance from price/  max price within distance',['distance from price','Max price in distance'])
+action=st.selectbox('Select the function you want   distance from price/  max price within distance',['distance from price','Max price in distance','Price distance between bid and ask'])
 if action=='distance from price':
     percentage_fromprice=st.number_input('enter the distance from current price',value=1000)
     st.write('You are now checking the Orders within %')
@@ -102,8 +102,11 @@ if action=='distance from price':
         ask_filtered,bid_filtered= get_bidask(df_bid_adjusted,df_ask_adjusted,BTC=0,USDT=USDT_filter)
     temp=pd.concat([ask_filtered,bid_filtered])
     symbols=temp.symbol.unique()
-    st.dataframe(ask_filtered.set_index('symbol'))
-    st.dataframe(bid_filtered.set_index('symbol'))
+    temp=ask_filtered.join(bid_filtered,lsuffix='_ask', rsuffix='_bid')
+    #temp=temp.drop(['index','symbol_ask'],axis=1)
+    st.dataframe(temp.set_index('symbol_bid'))
+    #st.dataframe(ask_filtered.set_index('symbol'))
+    #st.dataframe(bid_filtered.set_index('symbol'))
     #t.dataframe(ask_filtered.set_index('symbol'))
     st.write('Number of symbols detected are ' + str(len(symbols)))
     symbol=st.selectbox('Symbol',symbols)
@@ -129,8 +132,45 @@ elif action=='Max price in distance':
     st.write('Number of symbols in bid detected are ' + str(len(bid_filtered)))
     temp=pd.concat([ask_filtered,bid_filtered])
     symbols=temp.symbol.unique()
-    st.dataframe(ask_filtered.set_index('symbol'))
-    st.dataframe(bid_filtered.set_index('symbol'))
+    temp=ask_filtered.join(bid_filtered,lsuffix='_ask', rsuffix='_bid')
+    #temp=temp.drop(['index','symbol_ask'],axis=1)
+    st.dataframe(temp.set_index('symbol_bid'))
+    #st.dataframe(bid_filtered.set_index('symbol'))
+    #t.dataframe(ask_filtered.set_index('symbol'))
+    st.write('Number of symbols detected are ' + str(len(symbols)))
+    symbol=st.selectbox('Symbol',symbols)
+    show=st.button('Show graph')
+    if show:
+        fig=draw_filtered(ask_filtered,bid_filtered,symbol)
+        st.pyplot(fig)
+elif action=='Price distance between bid and ask':
+    #percentage_fromprice=st.number_input('enter the % to search for max order',value=3)
+    percentage_fromprice=1000000
+    st.write('Price distance between bid and ask')
+    df_bid_adjusted,df_ask_adjusted,prices=percentage_stept(df_bid_ex,df_ask_ex,quote,percentage,prices,2,percentage_fromprice)
+    temp_bid=pd.DataFrame()
+    temp_ask=pd.DataFrame()
+    df_bid_adjusted=df_bid_adjusted.reset_index()
+    l=df_bid_adjusted.groupby('symbol').amount_BTC.idxmax()
+    df_bid_adjusted=df_bid_adjusted[df_bid_adjusted.index.isin(l)]
+    l=df_ask_adjusted.groupby('symbol').amount_BTC.idxmax()
+    df_ask_adjusted=df_ask_adjusted[df_ask_adjusted.index.isin(l)]
+    
+    
+    ask_filtered=df_ask_adjusted[abs(df_ask_adjusted.price_diff)<percentage_fromprice]
+    bid_filtered=df_bid_adjusted[abs(df_bid_adjusted.price_diff)<percentage_fromprice]
+    st.write('Number of symbols in ask detected are ' + str(len(ask_filtered)))
+    st.write('Number of symbols in bid detected are ' + str(len(bid_filtered)))
+    temp=pd.concat([ask_filtered,bid_filtered])
+    symbols=temp.symbol.unique()
+    temp=ask_filtered.join(bid_filtered,lsuffix='_ask', rsuffix='_bid')
+    temp['distance']=abs(temp['price_diff_ask'])+abs(temp['price_diff_bid'])
+    filter1=st.number_input('filter for distance between highest bid and highest ask 1')
+    filter2=st.number_input('filter for distance between highest bid and highest ask 2')
+    temp=temp[(temp['distance']>min(filter1,filter2) )& (temp['distance']<max(filter1,filter2) )]
+    #temp=temp.drop(['index','symbol_ask'],axis=1)
+    st.dataframe(temp.set_index('symbol_bid'))
+    #st.dataframe(bid_filtered.set_index('symbol'))
     #t.dataframe(ask_filtered.set_index('symbol'))
     st.write('Number of symbols detected are ' + str(len(symbols)))
     symbol=st.selectbox('Symbol',symbols)
