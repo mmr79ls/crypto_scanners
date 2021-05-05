@@ -43,12 +43,17 @@ def search_pump(sampling,start):
         raw_all=pd.DataFrame()
         price_all=pd.DataFrame()
         data_all=pd.DataFrame()
-        s=[]
-        u=[]
+
         ex=ccxt.binance()
         ex.load_markets()
         f=pd.DataFrame(ex.fetch_markets())
         symbols=f[f['active']==True].symbol.unique()
+        #symbols=ex.symbols
+        def comp_prev(a,shift=1):
+            return (a.High-a.Close.shift(shift))*100/a.Close.shift(shift)#a.High
+        
+        s=[]
+        u=[]
         for symbol in symbols:
             if symbol.split('/')[1]=='BTC':
                 s.append(symbol)
@@ -60,10 +65,10 @@ def search_pump(sampling,start):
         for i in s:
                 if i.split('/')[0] not in u:
                     symbols.append(i)
+
        
         for symbol in symbols:
-            if symbol=='RENBTC/BTC':
-                continue
+      
             #print(symbol)
             raw,data,price=get_trades(ex,symbol,sampling,start)
             raw_all=pd.concat([raw,raw_all],ignore_index=True)
@@ -100,7 +105,7 @@ def search_pump(sampling,start):
         print(merged)        
         return merged
 
-start=st.text_input('start time','2021-05-01 08:00:00')
+start=st.text_input('start time','2021-05-04 08:00:00')
 sampling=st.text_input('resolution 1T,5T,1h      T=mins',value='1T')
 change=st.number_input('% to filter on change of price',value=3)
 #df=get_marketcap()

@@ -277,13 +277,13 @@ def time_dif(start):
     return start+pd.to_timedelta("1h")
 
 
-def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
+def get_trades(ex,symbol,sampling='1s',start='2021-05-04 10:00:00'):
     raw_symbol=pd.DataFrame()
     data=pd.DataFrame()
    
     #symbol='POLY/BTC'
 
-    start='2021-05-01 08:00:00'
+    #start='2021-05-01 08:00:00'
    
     since = ex.parse8601(start)
     a=trades(ex,symbol,since)
@@ -307,7 +307,7 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
     raw_symbol=pd.concat([raw,raw_symbol],ignore_index=True)
     raw_symbol.replace(np.inf, 0, inplace=True)
     raw_symbol.replace(np.NINF, 0, inplace=True)
-    data,price=ohlcv(ex,since,symbol,data)
+    data,price=ohlcv_pump(ex,since,symbol,data)
     data['Date']=pd.to_datetime(data['Time']*1000000)
     if len(raw_symbol[raw_symbol['spread_change']>100])>0:
         print('more buy')
@@ -325,21 +325,62 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-01 10:00:00'):
 
 def trades(ex,symbol,since):
         #since = ex.parse8601(since)
+        all_orders =pd.DataFrame()
+        s=[]
+        g=0
+        while since < ex.milliseconds ():#-(1000*60*5):
+            symbol = symbol  # change for your symbol
+            #limit = 20  # change for your limit
+        
+            orders =  pd.DataFrame(ex.fetch_trades(symbol, since,limit=1000))
+   
+            s.append(len(all_orders))
+            print(pd.to_datetime(since, unit='ms'))
+            if len(orders):
+                since =  orders['timestamp'].max()#orders[len(orders) - 1]['timestamp']
+             
+                if(g>0):
+                    if since==(all_orders['timestamp'].max()):
+                        since=ex.milliseconds()
+                        break
+                g+=1
+                all_orders=pd.concat([orders,all_orders])
+             
+                if len(all_orders)==s[-1]:
+                    break
+                #print(all_orders[-1])
+            else:
+                    break
+        #orders=pd.DataFrame(all_orders)
+        all_orders['symbol']=symbol
+        return all_orders
+    
+def ohlcv_pump(ex,since,symbol,data):
+        data=pd.DataFrame()
+        
         all_orders = []
         s=[]
         while since < ex.milliseconds ()-(1000*60*15):
             symbol = symbol  # change for your symbol
             #limit = 20  # change for your limit
         
-            orders =  ex.fetch_trades(symbol, since)
-            s.append(since)
-            print(ex.parse8601(since))
-            if len(orders):
-                since =  orders[len(orders) - 1]['timestamp']
-                all_orders += orders
-                #print(all_orders[-1])
-            elif(s[-1]==s[-2]):
+            #orders =  ex.fetch_ohlcv(symbol,'1m',since=since,limit=10000)
+            price=pd.DataFrame(ex.fetch_ohlcv(symbol,'1m',since=since),columns=['Time','Open','High','Low','Close','Volume'])
+            
+            s.append(len(data))
+            print(since)
+            if len(price):
+                since =  price['Time'].max()
+                #all_orders += orders
+                data=pd.concat([price,data])
+                if len(data)==s[-1]:
                     break
-        orders=pd.DataFrame(all_orders)
-        orders['symbol']=symbol
-        return orders
+                #print(all_orders[-1])
+            elif(s==since):
+                
+                break
+        data['symbol']=symbol
+        data['change']=comp_prev(data,1)
+        data['Date']=pd.to_datetime(data['Time']*1000000)
+        
+        return data,price
