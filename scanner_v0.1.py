@@ -145,7 +145,7 @@ elif action=='Max price in distance':
     symbol=st.selectbox('Symbol',symbols)
     show=st.button('Show graph')
     if show:
-        fig=draw_filtered(ask_filtered,bid_filtered,symbol)
+        fig=draw_filtered(ask_filtered.reset_index(),bid_filtered.reset_index(),symbol)
         st.pyplot(fig)
 elif action=='Price distance between bid and ask':
     #percentage_fromprice=st.number_input('enter the % to search for max order',value=3)
@@ -182,7 +182,7 @@ elif action=='Price distance between bid and ask':
     symbol=st.selectbox('Symbol',symbols)
     show=st.button('Show graph')
     if show:
-        fig=draw_filtered(ask_filtered,bid_filtered,symbol)
+        fig=draw_filtered(ask_filtered.reset_index(),bid_filtered.reset_index(),symbol)
         st.pyplot(fig)
     
 
