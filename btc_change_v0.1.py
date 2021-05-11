@@ -13,7 +13,7 @@ import numpy as np
 import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,plot_bokeh,Volume_change
 from datetime import datetime
-
+from streamlit import caching
 hide_streamlit_style = """
 <style>
 #MainMenu {visibility: hidden;}
@@ -24,7 +24,11 @@ footer {visibility: hidden;}
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 quote=st.selectbox('Symbol',['USDT','BTC'])
 #percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
-
+flag=st.button('rescan again')
+if flag==1:
+    caching.clear_cache()
+    a,df_bid_ex,df_ask_ex,prices=scan(quote)  
+    
 percentage=1
 @st.cache(allow_output_mutation=True)
 def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h'):
