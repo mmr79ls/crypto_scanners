@@ -6,7 +6,7 @@ import numpy as np
 from time import sleep
 import time
 import seaborn as sns
-
+import streamlit as st
 import time
 from time import struct_time
 
@@ -189,7 +189,7 @@ class crypto():
         #self.symbols=symbol
 
         starttime=time.mktime(self.time_obj)*1000
-
+        my_bar = st.progress(0)
         exchange=ccxt.binance()
         exchange.load_markets()
         OHLCV=pd.DataFrame()
@@ -221,6 +221,7 @@ class crypto():
                 since = exchange.milliseconds () - (80*86400000)
                 count+=1
                 print(count,'/',lenght)
+                my_bar.progress(count/lenght)
                 time.sleep (exchange.rateLimit / 2000)
                 a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =10000,since=since),columns=['Time','Open','High','Low','Close','Volume'])
                 a['Date']=pd.to_datetime(a['Time']*1000000)
