@@ -5,7 +5,7 @@ bokeh == 2.2.2
 
 # C:\Users\mraslan\Downloads\project\crypto1.py: 3
 # C:\Users\mraslan\Downloads\project\scanner_v0.1.py: 3
-ccxt == 1.43.73
+ccxt == 1.50.26
 
 # C:\Users\mraslan\Downloads\project\crypto1.py: 5
 # C:\Users\mraslan\Downloads\project\scanner_v0.1.py: 7
