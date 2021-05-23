@@ -381,9 +381,9 @@ def ohlcv_pump(ex,since,symbol,data):
                 if len(data)==s[-1]:
                     break
                 #print(all_orders[-1])
-            elif(s==since):
+            #elif(s==since):
                 
-                break
+             #   break
         data['symbol']=symbol
         data['change']=comp_prev(data,1)
         data['Date']=pd.to_datetime(data['Time']*1000000)
