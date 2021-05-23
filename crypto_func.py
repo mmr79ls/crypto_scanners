@@ -192,7 +192,7 @@ def pump_prepare(since,tf):
         data=pd.DataFrame()
         order=pd.DataFrame()
         #since = ex.milliseconds () - (m*86400000/24)
-        since = st.text_input("start date to check",'2021-04-24 00:00:00')
+        since = st.text_input("start date to check",'2021-05-16 00:00:00')
         since = ex.parse8601(since)
         #since = '2021-04-13 12:00:00'
         #since=pd.Timestamp(since)
@@ -277,7 +277,7 @@ def time_dif(start):
     return start+pd.to_timedelta("1h")
 
 
-def get_trades(ex,symbol,sampling='1s',start='2021-05-04 10:00:00'):
+def get_trades(ex,symbol,sampling='1s',start='2021-05-23 00:00:00'):
     raw_symbol=pd.DataFrame()
     data=pd.DataFrame()
    
@@ -288,6 +288,7 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-04 10:00:00'):
     since = ex.parse8601(start)
     a=trades(ex,symbol,since)
     #a['symbol']=symbol
+    #if len(a):
     a.datetime.sort_values()
     a.set_index('datetime',inplace=True)
     
@@ -315,8 +316,8 @@ def get_trades(ex,symbol,sampling='1s',start='2021-05-04 10:00:00'):
         print('more sell')
         print(symbol,raw_symbol[raw_symbol['buysell_to_vol%']<0.5].spread_change.count())
         print('large orders')
-        #print(symbol,raw_symbol[raw_symbol['cost']['sell']].max())
-        #print(symbol,raw_symbol[raw_symbol['cost']['buy']].max())
+    #print(symbol,raw_symbol[raw_symbol['cost']['sell']].max())
+    #print(symbol,raw_symbol[raw_symbol['cost']['buy']].max())
         
     
     return raw_symbol,data,price
@@ -328,7 +329,10 @@ def trades(ex,symbol,since):
         all_orders =pd.DataFrame()
         s=[]
         g=0
-        while since < ex.milliseconds ():#-(1000*60*5):
+        #pump = ex.parse8601('2021-05-09 17:00:00')
+        #pump=ex.milliseconds ()-(1000*60*5)
+        
+        while since <   ex.milliseconds ()-1000*60:#-(1000*60*5):
             symbol = symbol  # change for your symbol
             #limit = 20  # change for your limit
         
@@ -341,7 +345,7 @@ def trades(ex,symbol,since):
              
                 if(g>0):
                     if since==(all_orders['timestamp'].max()):
-                        since=ex.milliseconds()
+                        since=ex.milliseconds()-1000*60
                         break
                 g+=1
                 all_orders=pd.concat([orders,all_orders])
@@ -357,10 +361,11 @@ def trades(ex,symbol,since):
     
 def ohlcv_pump(ex,since,symbol,data):
         data=pd.DataFrame()
-        
+        #pump = ex.parse8601('2021-05-09 17:00:00')
+        #pump=ex.milliseconds ()-(1000*60*5)
         all_orders = []
         s=[]
-        while since < ex.milliseconds ()-(1000*60*15):
+        while since < ex.milliseconds ()-1000*60:
             symbol = symbol  # change for your symbol
             #limit = 20  # change for your limit
         
