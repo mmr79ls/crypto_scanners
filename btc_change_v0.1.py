@@ -42,11 +42,11 @@ print(coin)
 tf=st.text_input('Time frame (1m/1h/4h/1d/1w)','1h')
 OHLCV,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
 st.write('BTC price change')
-
-start = st.text_input("start date to check",'2021-04-13 12:00:00')
+jj=str(OHLCV['Date'].min())
+start = st.text_input("start date to check",jj)
 start=pd.Timestamp(start)
-
-end = st.text_input("End date to check",'2021-04-13 14:00:00')
+jj1=str(OHLCV['Date'].max())
+end = st.text_input("End date to check",jj1)
 end=pd.Timestamp(end)
 
 change1=st.number_input('enter the % of change in lower percentage to search for ',value=-100)
