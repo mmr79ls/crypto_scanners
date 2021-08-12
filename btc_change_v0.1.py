@@ -40,12 +40,12 @@ time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0)
 coin=st.text_input('Enter the coin you want to check from whale bot','BTC')
 print(coin)
 tf=st.text_input('Time frame (1m/1h/4h/1d/1w)','1h')
-OHLCV,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
+OHLCV1,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
 st.write('BTC price change')
-jj=str(OHLCV['Date'].min()[0])
+jj=str(OHLCV1['Date'].min()[0])
 start = st.text_input("start date to check",jj)
 start=pd.Timestamp(start)
-jj1=str(OHLCV['Date'].max()[0])
+jj1=str(OHLCV1['Date'].max()[0])
 end = st.text_input("End date to check",jj1)
 end=pd.Timestamp(end)
 
@@ -62,7 +62,7 @@ vchange1=st.number_input('enter the % of change in lower percentage in volume to
 vchange2=st.number_input('enter the % of change in higher percentage in volume to search for ',value=100)
 vchange_low=min(vchange1,vchange2)
 vchange_high=max(vchange1,vchange2)
-OHLCV_change=BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,v_volume_filter,vchange_low,vchange_high)
+OHLCV_change=BTC_drop_change(OHLCV1,start,end,change_low,change_high,v_start,v_end,v_volume_filter,vchange_low,vchange_high)
 st.dataframe(OHLCV_change.set_index('Date'))
 
 
@@ -70,7 +70,7 @@ st.dataframe(OHLCV_change.set_index('Date'))
 
 #st.dataframe(OHLCV_vol.set_index('Date'))
 symbol=st.text_input('input the symbol to be checked','BTC/USDT')
-df=OHLCV[OHLCV['symbol']==symbol]
+df=OHLCV1[OHLCV1['symbol']==symbol]
 #p=plot_bokeh(into,outfrom,df)
 
 #st.bokeh_chart(p)
