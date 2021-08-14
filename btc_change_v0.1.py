@@ -92,10 +92,11 @@ if program=='BTC_change':
     st.write('BTC price change')
     choice=st.selectbox('',['Change % check','volume filter'])
     if choice=='Change % check':
-            start = st.text_input("start date to check",'2021-04-13 12:00:00')
+     jj=str(OHLCV1[OHLCV1['symbol']=='BTC/USDT'].Date.min())
+            start = st.text_input("start date to check",jj)
             start=pd.Timestamp(start)
-            
-            end = st.text_input("End date to check",'2021-04-13 14:00:00')
+            jj1=str(OHLCV1[OHLCV1['symbol']=='BTC/USDT'].Date.max())
+            end = st.text_input("End date to check",jj1)
             end=pd.Timestamp(end)
             
             change1=st.number_input('enter the % of change in lower percentage to search for ',value=-100)
