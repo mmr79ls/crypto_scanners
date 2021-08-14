@@ -79,7 +79,7 @@ if program=='BTC_change':
 
     
         time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0)
-        OHLCV,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h') 
+        OHLCV1,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h') 
         
     percentage=1
 
@@ -88,7 +88,7 @@ if program=='BTC_change':
     coin=st.text_input('Enter the coin you want to check from whale bot','BTC')
     print(coin)
     tf=st.text_input('Time frame (1m/1h/4h/1d/1w)','1h')
-    OHLCV,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
+    OHLCV1,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
     st.write('BTC price change')
     choice=st.selectbox('',['Change % check','volume filter'])
     if choice=='Change % check':
@@ -104,7 +104,7 @@ if program=='BTC_change':
             change_low=min(change1,change2)
             change_high=max(change1,change2)
             v_start=v_end=v_volume_filter=vchange_low=vchange_high=flag=0
-            OHLCV_change=BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,v_volume_filter,vchange_low,vchange_high,flag)
+            OHLCV_change=BTC_drop_change(OHLCV1,start,end,change_low,change_high,v_start,v_end,v_volume_filter,vchange_low,vchange_high,flag)
             st.dataframe(OHLCV_change.set_index('Date'))
     elif choice=='volume filter':
             start = st.text_input("start date to check",'2021-04-13 12:00:00')
@@ -127,11 +127,11 @@ if program=='BTC_change':
             vchange_low=min(vchange1,vchange2)
             vchange_high=max(vchange1,vchange2)
             v_volume_filter=0
-            OHLCV_change=BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,v_volume_filter,vchange_low,vchange_high,1)
+            OHLCV_change=BTC_drop_change(OHLCV1,start,end,change_low,change_high,v_start,v_end,v_volume_filter,vchange_low,vchange_high,1)
             st.dataframe(OHLCV_change.set_index('Date'))
         
             symbol=st.text_input('input the symbol to be checked','BTC/USDT')
-            f=OHLCV[OHLCV['symbol']==symbol]
+            f=OHLCV1[OHLCV1['symbol']==symbol]
     #p=plot_bokeh(into,outfrom,df)
     
     #st.bokeh_chart(p)
