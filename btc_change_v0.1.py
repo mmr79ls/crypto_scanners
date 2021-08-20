@@ -66,7 +66,7 @@ def price_calculator():
         print('profit is ',profit)
         print('profit in BTC ',profit_BTC)
         return change,profit,profit_BTC
-program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator'])
+program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','Close_analysis'])
 if program=='Price_calculator':
     change,profit,profit_BTC=price_calculator()
 
@@ -139,7 +139,7 @@ if program=='BTC_change':
     
     #st.bokeh_chart(p)
     #show(p)
-if  program=='Close_count':
+if  program=='Close_analysis':
         
            
            ex=ccxt.binance()
