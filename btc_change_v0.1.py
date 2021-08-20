@@ -13,7 +13,7 @@ import numpy as np
 import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,plot_bokeh,Volume_change
 from datetime import datetime
-from binance import Client, ThreadedWebsocketManager, ThreadedDepthCacheManager
+
 import matplotlib.pyplot as plt
 from streamlit import caching
 import plotly.express as px
