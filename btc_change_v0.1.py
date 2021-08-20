@@ -6,14 +6,17 @@ Created on Mon Apr 12 18:32:12 2021
 """
 
 import ccxt
-from crypto1 import crypto
+from crypto2 import crypto
 import pandas as pd
 import streamlit as st
 import numpy as np
 import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,plot_bokeh,Volume_change
 from datetime import datetime
+from binance import Client, ThreadedWebsocketManager, ThreadedDepthCacheManager
+import matplotlib.pyplot as plt
 from streamlit import caching
+import plotly.express as px
 hide_streamlit_style = """
 <style>
 #MainMenu {visibility: hidden;}
@@ -136,5 +139,40 @@ if program=='BTC_change':
     
     #st.bokeh_chart(p)
     #show(p)
-    
-    
+if  program=='Close_count':
+        
+           
+           ex=ccxt.binance()
+           
+           f=pd.DataFrame(ex.fetch_markets())
+           symbols=f[f['active']==True].symbol.unique()
+           
+           symbol=st.selectbox('Symbol',symbols)
+           tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
+          
+           df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+           df['Date']=pd.to_datetime(df['Time']*1000000)
+           
+           strt=df['Date'].min()
+           st.write('Data loaded from '+str(strt))
+           start = st.text_input("The start of duration to check",strt)
+           start=pd.Timestamp(start)
+           df=df[df['Date']>start]
+           
+           #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
+           #df=df.astype( dtype={
+               
+           #f=pd.DataFrame(ex.fetch_markets())
+
+           print('scan')
+           #df=OHLCV1[OHLCV1['symbol']==symbol]
+           step=df.Close.max()*2/100
+           #fig=plot_hist(df,step)
+           bins=np.arange(df.Close.min(), df.Close.max() + step, step)
+           #hist_values= np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
+           #st.bar_chart(bins[1:],hist_values)
+         
+
+           fig = px.histogram(df, x="Close",nbins=len(bins))
+           #fig.show()
+           st.write(fig)
