@@ -93,7 +93,7 @@ if program=='BTC_change':
     tf=st.text_input('Time frame (1m/1h/4h/1d/1w)','1h')
     OHLCV1,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
     st.write('BTC price change')
-    choice=st.selectbox('',['Change % check','volume filter'])
+    choice=st.selectbox('',['Change % check','volume filter','Close_analysis'])
     if choice=='Change % check':
             jj=str(OHLCV1[OHLCV1['symbol']=='BTC/USDT'].Date.min())
             start = st.text_input("start date to check",jj)
@@ -135,6 +135,27 @@ if program=='BTC_change':
         
             symbol=st.text_input('input the symbol to be checked','BTC/USDT')
             f=OHLCV1[OHLCV1['symbol']==symbol]
+    elif choice=='Close_analysis':
+            percent_price=st.number_input('Enter the % from price to calculate',1.0)
+            num_close=st.number_input('Enter the number of Closes to filter',3)
+            start = st.text_input("The start of duration to check",'2021-08-11 20:00:00')
+            start=pd.Timestamp(start)
+                      
+            closes=pd.DataFrame()
+            for symbol in OHLCV1['symbols']:
+                df=OHLCV1[OHLCV1['symbol']==symbol]
+                df=df[df['Date']>=start]  
+                step=percent_price*df.Close.max()/100
+                bins=np.arange(df.Close.min(), df.Close.max() + step, step)
+                hist_values,x = np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
+                f=pd.DataFrame(hist_values,x[1:],columns=['count'])
+                f=f[f['count']>num_close]
+                price=df[df['Time']==df['Time'].max()].Close.max()
+                f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
+                f['price']=price
+                closes=pd.concat[f,closes]
+            closes.set_index('symbols',inplace=True)
+            st.dataframe(closes)
     #p=plot_bokeh(into,outfrom,df)
     
     #st.bokeh_chart(p)
