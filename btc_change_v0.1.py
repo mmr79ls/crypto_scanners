@@ -137,7 +137,7 @@ if program=='BTC_change':
             f=OHLCV1[OHLCV1['symbol']==symbol]
     elif choice=='Close_analysis':
             percent_price=st.number_input('Enter the % from price to calculate',1.0)
-            num_close=st.number_input('Enter the number of Closes to filter',3)
+            num_close=st.number_input('Enter the number of Closes to filter',0)
             start = st.text_input("The start of duration to check",'2021-08-11 20:00:00')
             start=pd.Timestamp(start)
                       
@@ -149,6 +149,7 @@ if program=='BTC_change':
                 bins=np.arange(df.Close.min(), df.Close.max() + step, step)
                 hist_values,x = np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
                 f=pd.DataFrame(hist_values,x[1:],columns=['count'])
+       
                 f=f[f['count']>num_close]
                 print(df)
                 price=df[df['Date']==df['Date'].max()].Close.max()
