@@ -145,6 +145,7 @@ if program=='BTC_change':
             symbols=['BTC/USDT','ICP/USDT','ETH/USDT','LTC/USDT','XRP/USDT']
             for symbol in symbols:# OHLCV1['symbol']:
                 df=OHLCV1[OHLCV1['symbol']==symbol]
+                st.dataframe(df)
                 df=df[df['Date']>=start]  
                 step=percent_price*df.Close.max()/100
                 bins=np.arange(df.Close.min(), df.Close.max() + step, step)
@@ -176,9 +177,23 @@ if  program=='Close_analysis':
            ex=ccxt.binance()
            
            f=pd.DataFrame(ex.fetch_markets())
-           symbols=f[f['active']==True].symbol.unique()
+           symbs=f[f['active']==True].symbol.unique()
+
+           s=[]
+           u=[]
+           for symbol in symbs:
+          
+              if symbol.split('/')[1]=='USDT':
+                u.append(symbol)
+           symbols=[]        
+           for i in u:
+                 t=i.find('DOWN/' or 'UP/' or 'BULL/' or 'BEAR/')
+                 if(t==-1):
+                        symbols.append(i)
         
            symbol=st.selectbox('Symbol',symbols)
+           t=st.radio('Symbol',symbols)
+           st.write(t)
            tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
           
            df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
