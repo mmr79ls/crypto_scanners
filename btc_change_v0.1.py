@@ -193,8 +193,9 @@ if  program=='Close_analysis':
         
            #symbol=st.selectbox('Symbol',symbols)
            symbol=st.sidebar.radio('Symbol',symbols)
-           st.write(t)
            tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
+           percent_price=st.number_input('Enter the % from price to calculate',1.0)
+           #num_close=st.number_input('Enter the number of Closes to filter',0)
           
            df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
            df['Date']=pd.to_datetime(df['Time']*1000000)
@@ -204,6 +205,7 @@ if  program=='Close_analysis':
            start = st.text_input("The start of duration to check",'2021-08-11 20:00:00')
            start=pd.Timestamp(start)
            df=df[df['Date']>start]
+           
            price=df[df['Date']==df['Date'].max()].Close.max()
            #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
            #df=df.astype( dtype={
@@ -212,7 +214,7 @@ if  program=='Close_analysis':
 
            print('scan')
            #df=OHLCV1[OHLCV1['symbol']==symbol]
-           step=df.Close.max()*2/100
+           step=df.Close.max()*percent_price/100
            #fig=plot_hist(df,step)
            bins=np.arange(df.Close.min(), df.Close.max() + step, step)
            #hist_values= np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
