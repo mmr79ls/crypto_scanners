@@ -151,7 +151,7 @@ if program=='BTC_change':
                 f=pd.DataFrame(hist_values,x[1:],columns=['count'])
        
                 f=f[f['count']>num_close]
-                if(len(f):
+                if(len(f)):
                         price=df[df['Date']==df['Date'].max()].Close.max()
                         f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
                         f['price']=price
