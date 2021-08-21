@@ -153,8 +153,9 @@ if program=='BTC_change':
                 price=df[df['Time']==df['Time'].max()].Close.max()
                 f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
                 f['price']=price
+                
                 closes=pd.concat[f,closes]
-            closes.set_index('symbols',inplace=True)
+            closes.set_index('symbol',inplace=True)
             st.dataframe(closes)
     #p=plot_bokeh(into,outfrom,df)
     
