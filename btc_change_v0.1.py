@@ -142,8 +142,8 @@ if program=='BTC_change':
             start=pd.Timestamp(start)
                       
             closes=pd.DataFrame()
-            symbols=['BTC/USDT','ICP/USDT','ETH/USDT','LTC/USDT','XRP/USDT']
-            for symbol in symbols:# OHLCV1['symbol']:
+            #symbols=['BTC/USDT','ICP/USDT','ETH/USDT','LTC/USDT','XRP/USDT']
+            for symbol in OHLCV1['symbol']:
                 df=OHLCV1[OHLCV1['symbol']==symbol]
                 df=df[df['Date']>=start]  
                 step=percent_price*df.Close.max()/100
@@ -154,13 +154,15 @@ if program=='BTC_change':
                 f=f[f['count']>num_close]
                 if(len(f)):
                         price=df[df['Date']==df['Date'].max()].Close.max()
+                        f['Close_range_start']=f.index
+                        f['Close_range_end']=f.index+step
                         f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
                         f['price']=price
                         
                         f['symbol']=symbol
-                        f['Close_range_start']=f.index
-                        f['Close_range_end']=f.index+step
+                       
                         f=f.reset_index()
+                        f=f.drop(column=['index'])
                        
                         
 
