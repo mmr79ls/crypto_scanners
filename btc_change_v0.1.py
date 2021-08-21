@@ -142,7 +142,7 @@ if program=='BTC_change':
             start=pd.Timestamp(start)
                       
             closes=pd.DataFrame()
-            for symbol in OHLCV1['symbols']:
+            for symbol in OHLCV1['symbol']:
                 df=OHLCV1[OHLCV1['symbol']==symbol]
                 df=df[df['Date']>=start]  
                 step=percent_price*df.Close.max()/100
