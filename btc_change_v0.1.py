@@ -189,7 +189,7 @@ if  program=='Close_analysis':
            start = st.text_input("The start of duration to check",'2021-08-11 20:00:00')
            start=pd.Timestamp(start)
            df=df[df['Date']>start]
-           
+           price=df[df['Date']==df['Date'].max()].Close.max()
            #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
            #df=df.astype( dtype={
                
@@ -205,5 +205,7 @@ if  program=='Close_analysis':
          
 
            fig = px.histogram(df, x="Close",nbins=len(bins))
+           fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
+
            #fig.show()
            st.write(fig)
