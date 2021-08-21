@@ -154,15 +154,13 @@ if program=='BTC_change':
                 f=f[f['count']>num_close]
                 if(len(f)):
                         price=df[df['Date']==df['Date'].max()].Close.max()
-                        f['Close_range_start']=f.index
-                        f['Close_range_end']=f.index+step
                         f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
+                        f['Close_range_start']=f.index
+                        f['Close_range_end']=f.index+step                        
                         f['price']=price
-                        
                         f['symbol']=symbol
-                       
                         f=f.reset_index()
-                        f=f.drop(column=['index'])
+                        f=f.drop('index', axis=1, inplace=True)
                        
                         
 
