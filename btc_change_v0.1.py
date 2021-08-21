@@ -156,6 +156,8 @@ if program=='BTC_change':
                         price=df[df['Date']==df['Date'].max()].Close.max()
                         f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
                         f['price']=price
+                        st.dataframe(closes)
+                        
 
                         closes=pd.concat([f,closes],ignore_index=True)
             #closes.set_index('symbol',inplace=True)
