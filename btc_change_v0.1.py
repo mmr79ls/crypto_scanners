@@ -172,31 +172,13 @@ if program=='BTC_change':
     #st.bokeh_chart(p)
     #show(p)
 if  program=='Close_analysis':
-           data = [['Le goumet', 10], ['The Alcove', 15], ['Mojo Restaurant', 14], ['Mojo Restaurant', 1]]
-
-        # Create the pandas DataFrame
-           df = pd.DataFrame(data, columns=['Name', 'ID'])
-
-           values = df['Name'].tolist()
-           options = df['ID'].tolist()
-           dic = dict(zip(options, values))
-
-           a = st.sidebar.selectbox('Choose a restaurant', options, format_func=lambda x: dic[x])
-
-           st.write(a)
-           
+                     
            ex=ccxt.binance()
            
            f=pd.DataFrame(ex.fetch_markets())
            symbols=f[f['active']==True].symbol.unique()
-           display = (symbols)
-
-           options = list(range(len(display)))
-
-           value = st.selectbox("BTC/USDT", options, format_func=lambda x: display[x])
-           symbol=value
-           st.write(value)
-           #symbol=st.selectbox('Symbol',symbols)
+        
+           symbol=st.selectbox('Symbol',symbols)
            tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
           
            df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
