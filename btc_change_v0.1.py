@@ -160,7 +160,7 @@ if program=='BTC_change':
                         f['price']=price
                         f['symbol']=symbol
                         f=f.reset_index()
-                        f=f.drop('index', axis=1, inplace=True)
+                        #f=f.drop('index', axis=1, inplace=True)
                        
                         
 
