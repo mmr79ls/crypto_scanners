@@ -158,7 +158,7 @@ if program=='BTC_change':
                         f['price']=price
 
                         closes=pd.concat([f,closes],ignore_index=True)
-            closes.set_index('symbol',inplace=True)
+            #closes.set_index('symbol',inplace=True)
             st.dataframe(closes)
     #p=plot_bokeh(into,outfrom,df)
     
