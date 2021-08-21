@@ -150,6 +150,7 @@ if program=='BTC_change':
                 hist_values,x = np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
                 f=pd.DataFrame(hist_values,x[1:],columns=['count'])
                 f=f[f['count']>num_close]
+                print(df)
                 price=df[df['Date']==df['Date'].max()].Close.max()
                 f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
                 f['price']=price
