@@ -151,12 +151,12 @@ if program=='BTC_change':
                 f=pd.DataFrame(hist_values,x[1:],columns=['count'])
        
                 f=f[f['count']>num_close]
-                print(df)
-                price=df[df['Date']==df['Date'].max()].Close.max()
-                f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
-                f['price']=price
-                
-                closes=pd.concat[f,closes]
+                if(len(f):
+                        price=df[df['Date']==df['Date'].max()].Close.max()
+                        f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
+                        f['price']=price
+
+                        closes=pd.concat[f,closes]
             closes.set_index('symbol',inplace=True)
             st.dataframe(closes)
     #p=plot_bokeh(into,outfrom,df)
