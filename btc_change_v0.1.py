@@ -160,7 +160,7 @@ if program=='BTC_change':
                         f['symbol']=symbol
                         f['Close_range_start']=f.index
                         f['Close_range_end']=f.index+step
-                        st.dataframe(f)
+                       
                         
 
                         closes=pd.concat([f,closes],ignore_index=True)
