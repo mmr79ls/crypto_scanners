@@ -156,10 +156,11 @@ if program=='BTC_change':
                         price=df[df['Date']==df['Date'].max()].Close.max()
                         f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
                         f['price']=price
-                        f=f.reset_index()
+                        
                         f['symbol']=symbol
                         f['Close_range_start']=f.index
                         f['Close_range_end']=f.index+step
+                        f=f.reset_index()
                        
                         
 
