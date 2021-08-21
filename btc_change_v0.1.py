@@ -158,11 +158,13 @@ if program=='BTC_change':
                         f['price']=price
                         f=f.reset_index()
                         f['symbol']=symbol
+                        f['Close_range_start']=f.index
+                        f['Close_range_end']=f.index+step
                         st.dataframe(f)
                         
 
                         closes=pd.concat([f,closes],ignore_index=True)
-            #closes.set_index('symbol',inplace=True)
+            closes.set_index('symbol',inplace=True)
             st.dataframe(closes)
     #p=plot_bokeh(into,outfrom,df)
     
