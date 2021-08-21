@@ -191,8 +191,8 @@ if  program=='Close_analysis':
                  if(t==-1):
                         symbols.append(i)
         
-           symbol=st.selectbox('Symbol',symbols)
-           t=st.radio('Symbol',symbols)
+           #symbol=st.selectbox('Symbol',symbols)
+           symbol=st.sidebar.radio('Symbol',symbols)
            st.write(t)
            tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
           
