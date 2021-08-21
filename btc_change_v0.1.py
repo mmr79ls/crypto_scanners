@@ -187,7 +187,7 @@ if  program=='Close_analysis':
            
            strt=df['Date'].min()
            st.write('Data loaded from '+str(strt))
-           start = st.text_input("The start of duration to check",strt)
+           start = st.text_input("The start of duration to check",'2021-08-11 20:00:00')
            start=pd.Timestamp(start)
            df=df[df['Date']>start]
            
