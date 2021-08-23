@@ -169,48 +169,48 @@ if program=='BTC_change':
 
 
                                 closes=pd.concat([f,closes],ignore_index=True)
-                    closes=closes.sort_values('count',ascending=False)
-                    symbols=closes['symbol'].drop_duplicates().to_list()
-                    closes.set_index('symbol',inplace=True)
+            closes=closes.sort_values('count',ascending=False)
+            symbols=closes['symbol'].drop_duplicates().to_list()
+            closes.set_index('symbol',inplace=True)
 
 
 
 
-                    ex=ccxt.binance()
+            ex=ccxt.binance()
 
 
-                    symbol=st.sidebar.radio('Symbol',symbols)
+            symbol=st.sidebar.radio('Symbol',symbols)
 
-                     #tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
-                     #percent_price=st.number_input('Enter the % from price to calculate',1.0)
-                   #num_close=st.number_input('Enter the number of Closes to filter',0)
+             #tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
+             #percent_price=st.number_input('Enter the % from price to calculate',1.0)
+           #num_close=st.number_input('Enter the number of Closes to filter',0)
 
-                    df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
-                    df['Date']=pd.to_datetime(df['Time']*1000000)
+            df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+            df['Date']=pd.to_datetime(df['Time']*1000000)
 
-                    strt=df['Date'].min()
-                    st.write('Data loaded from date '+str(strt))
-                    start_filter = st.text_input("The start of duration to check",'2021-08-11 23:00:00')
-                    start_filter=pd.Timestamp(start_filter)
-                    df=df[df['Date']>start_filter]
+            #strt=df['Date'].min()
+            #st.write('Data loaded from date '+str(strt))
+            #start_filter = st.text_input("The start of duration to check",'2021-08-11 23:00:00')
+            #start_filter=pd.Timestamp(start_filter)
+            df=df[df['Date']>start]
 
-                    price=df[df['Date']==df['Date'].max()].Close.max()
-                   #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
-                   #df=df.astype( dtype={
+            price=df[df['Date']==df['Date'].max()].Close.max()
+           #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
+           #df=df.astype( dtype={
 
-                   #f=pd.DataFrame(ex.fetch_markets())
+           #f=pd.DataFrame(ex.fetch_markets())
 
-                    print('scan')
-                   #df=OHLCV1[OHLCV1['symbol']==symbol]
-                    step=df.Close.max()*percent_price/100
-                   #fig=plot_hist(df,step)
-                    bins=np.arange(df.Close.min(), df.Close.max() + step, step)
-                    fig = px.histogram(df, x="Close",nbins=len(bins))
-                    fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
+            print('scan')
+           #df=OHLCV1[OHLCV1['symbol']==symbol]
+            step=df.Close.max()*percent_price/100
+           #fig=plot_hist(df,step)
+            bins=np.arange(df.Close.min(), df.Close.max() + step, step)
+            fig = px.histogram(df, x="Close",nbins=len(bins))
+            fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
 
-                   #fig.show()
-                    st.write(fig)
-                    st.dataframe(closes[closes.index==symbol])
+           #fig.show()
+            st.write(fig)
+            st.dataframe(closes[closes.index==symbol])
             #p=plot_bokeh(into,outfrom,df)
     
     #st.bokeh_chart(p)
