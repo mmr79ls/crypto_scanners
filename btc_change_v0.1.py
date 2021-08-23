@@ -194,14 +194,14 @@ if program=='BTC_change':
 
             print('scan')
            #df=OHLCV1[OHLCV1['symbol']==symbol]
-           step=df.Close.max()*percent_price/100
+            step=df.Close.max()*percent_price/100
            #fig=plot_hist(df,step)
-           bins=np.arange(df.Close.min(), df.Close.max() + step, step)
-           fig = px.histogram(df, x="Close",nbins=len(bins))
-           fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
+            bins=np.arange(df.Close.min(), df.Close.max() + step, step)
+            fig = px.histogram(df, x="Close",nbins=len(bins))
+            fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
 
            #fig.show()
-           st.write(fig)    
+            st.write(fig)    
     #p=plot_bokeh(into,outfrom,df)
     
     #st.bokeh_chart(p)
