@@ -171,7 +171,7 @@ if program=='BTC_change':
                 
                 
             ex=ccxt.binance()
-            symbols=closes.sort_values('count',ascending=False)['symbol'].to_list()
+            symbols=closes.sort_values('count',ascending=False)['symbol'].unqiue()
             print(symbols)
             symbol=st.sidebar.radio('Symbol',symbols)
              #tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
