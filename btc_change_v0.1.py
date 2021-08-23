@@ -187,9 +187,9 @@ if program=='BTC_change':
 
             strt=df['Date'].min()
             st.write('Data loaded from date '+str(strt))
-            start = st.text_input("The start of duration to check",'2021-08-11 20:00:00')
-            start=pd.Timestamp(start)
-            df=df[df['Date']>start]
+            start_filter = st.text_input("The start of duration to check",'2021-08-11 23:00:00')
+            start_filter=pd.Timestamp(start_filter)
+            df=df[df['Date']>start_filter]
 
             price=df[df['Date']==df['Date'].max()].Close.max()
            #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
