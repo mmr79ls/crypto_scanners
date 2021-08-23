@@ -167,11 +167,12 @@ if program=='BTC_change':
 
                         closes=pd.concat([f,closes],ignore_index=True)
             closes.set_index('symbol',inplace=True)
+            closes=closes.sort_values('count',ascending=False)
             st.dataframe(closes)
                 
                 
             ex=ccxt.binance()
-            symbols=closes.sort_values('count',ascending=False)['symbol'].unqiue()
+            symbols=closes['symbol'].unqiue()
             st.write(symbols)
             symbol=st.sidebar.radio('Symbol',symbols)
             st.write(symbol)
