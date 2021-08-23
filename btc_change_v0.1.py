@@ -175,7 +175,7 @@ if program=='BTC_change':
                 
             ex=ccxt.binance()
             
-            st.write(symbols)
+            
             symbol=st.sidebar.radio('Symbol',symbols)
       
              #tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
@@ -186,7 +186,7 @@ if program=='BTC_change':
             df['Date']=pd.to_datetime(df['Time']*1000000)
 
             strt=df['Date'].min()
-            st.write('Data loaded from '+str(strt))
+            st.write('Data loaded from date '+str(strt))
             start = st.text_input("The start of duration to check",'2021-08-11 20:00:00')
             start=pd.Timestamp(start)
             df=df[df['Date']>start]
