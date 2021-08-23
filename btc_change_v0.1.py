@@ -146,7 +146,7 @@ if program=='BTC_change':
             a=['USDC/USDT' , 'EUR/USDT', 'TUSD/USDT' , 'BUSD/USDT' , 'PAX/USDT' , 'AUD/USDT' , 'SUSD/USDT' , 'GBP/USDT' , 'PAXG/USDT']
         
             for symbol in symbols:# OHLCV1['symbol']:
-                if symbol not in a:
+                    if symbol not in a:
                         df=OHLCV1[OHLCV1['symbol']==symbol]
                         #st.dataframe(df)
                         df=df[df['Date']>=start]  
