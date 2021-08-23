@@ -167,7 +167,7 @@ if program=='BTC_change':
 
                         closes=pd.concat([f,closes],ignore_index=True)
             closes=closes.sort_values('count',ascending=False)
-            symbols=closes['symbol'].drop_duplicates()
+            symbols=closes['symbol'].drop_duplicates().to_list()
             closes.set_index('symbol',inplace=True)
             
             st.dataframe(closes)
