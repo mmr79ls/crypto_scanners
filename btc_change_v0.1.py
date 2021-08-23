@@ -146,17 +146,17 @@ if program=='BTC_change':
             a=['USDC/USDT' , 'EUR/USDT', 'TUSD/USDT' , 'BUSD/USDT' , 'PAX/USDT' , 'AUD/USDT' , 'SUSD/USDT' , 'GBP/USDT' , 'PAXG/USDT']
         
             for symbol in symbols:# OHLCV1['symbol']:
-                    if symbol not in a:
-                        df=OHLCV1[OHLCV1['symbol']==symbol]
+                 if symbol not in a:
+                    df=OHLCV1[OHLCV1['symbol']==symbol]
                         #st.dataframe(df)
-                        df=df[df['Date']>=start]  
-                        step=percent_price*df.Close.max()/100
-                        bins=np.arange(df.Close.min(), df.Close.max() + step, step)
-                        hist_values,x = np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
-                        f=pd.DataFrame(hist_values,x[1:],columns=['count'])
+                    df=df[df['Date']>=start]  
+                    step=percent_price*df.Close.max()/100
+                    bins=np.arange(df.Close.min(), df.Close.max() + step, step)
+                    hist_values,x = np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
+                    f=pd.DataFrame(hist_values,x[1:],columns=['count'])
 
-                        f=f[f['count']>num_close]
-                        if(len(f)):
+                    f=f[f['count']>num_close]
+                    if(len(f)):
                                 price=df[df['Date']==df['Date'].max()].Close.max()
                                 f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
                                 f['Close_range_start']=f.index
