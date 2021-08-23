@@ -143,72 +143,75 @@ if program=='BTC_change':
                       
             closes=pd.DataFrame()
             symbols=OHLCV1['symbol'].unique()
+            a=['USDC/USDT' , 'EUR/USDT', 'TUSD/USDT' , 'BUSD/USDT' , 'PAX/USDT' , 'AUD/USDT' , 'SUSD/USDT' , 'GBP/USDT' , 'PAXG/USDT']
+        
             for symbol in symbols:# OHLCV1['symbol']:
-                df=OHLCV1[OHLCV1['symbol']==symbol]
-                #st.dataframe(df)
-                df=df[df['Date']>=start]  
-                step=percent_price*df.Close.max()/100
-                bins=np.arange(df.Close.min(), df.Close.max() + step, step)
-                hist_values,x = np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
-                f=pd.DataFrame(hist_values,x[1:],columns=['count'])
-       
-                f=f[f['count']>num_close]
-                if(len(f)):
-                        price=df[df['Date']==df['Date'].max()].Close.max()
-                        f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
-                        f['Close_range_start']=f.index
-                        f['Close_range_end']=f.index+step                        
-                        f['price']=price
-                        f['symbol']=symbol
-                        f=f.reset_index()
-                        #f=f.drop('index', axis=1, inplace=True)
-                       
-                        
+                if symbol not in a:
+                        df=OHLCV1[OHLCV1['symbol']==symbol]
+                        #st.dataframe(df)
+                        df=df[df['Date']>=start]  
+                        step=percent_price*df.Close.max()/100
+                        bins=np.arange(df.Close.min(), df.Close.max() + step, step)
+                        hist_values,x = np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
+                        f=pd.DataFrame(hist_values,x[1:],columns=['count'])
 
-                        closes=pd.concat([f,closes],ignore_index=True)
-            closes=closes.sort_values('count',ascending=False)
-            symbols=closes['symbol'].drop_duplicates().to_list()
-            closes.set_index('symbol',inplace=True)
-            
-            
-                
-                
-            ex=ccxt.binance()
-            
-            
-            symbol=st.sidebar.radio('Symbol',symbols)
-      
-             #tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
-             #percent_price=st.number_input('Enter the % from price to calculate',1.0)
-           #num_close=st.number_input('Enter the number of Closes to filter',0)
+                        f=f[f['count']>num_close]
+                        if(len(f)):
+                                price=df[df['Date']==df['Date'].max()].Close.max()
+                                f['change']=f.apply(lambda x :100*( x.index-price)/x.index)
+                                f['Close_range_start']=f.index
+                                f['Close_range_end']=f.index+step                        
+                                f['price']=price
+                                f['symbol']=symbol
+                                f=f.reset_index()
+                                #f=f.drop('index', axis=1, inplace=True)
 
-            df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
-            df['Date']=pd.to_datetime(df['Time']*1000000)
 
-            strt=df['Date'].min()
-            st.write('Data loaded from date '+str(strt))
-            start_filter = st.text_input("The start of duration to check",'2021-08-11 23:00:00')
-            start_filter=pd.Timestamp(start_filter)
-            df=df[df['Date']>start_filter]
 
-            price=df[df['Date']==df['Date'].max()].Close.max()
-           #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
-           #df=df.astype( dtype={
+                                closes=pd.concat([f,closes],ignore_index=True)
+                    closes=closes.sort_values('count',ascending=False)
+                    symbols=closes['symbol'].drop_duplicates().to_list()
+                    closes.set_index('symbol',inplace=True)
 
-           #f=pd.DataFrame(ex.fetch_markets())
 
-            print('scan')
-           #df=OHLCV1[OHLCV1['symbol']==symbol]
-            step=df.Close.max()*percent_price/100
-           #fig=plot_hist(df,step)
-            bins=np.arange(df.Close.min(), df.Close.max() + step, step)
-            fig = px.histogram(df, x="Close",nbins=len(bins))
-            fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
 
-           #fig.show()
-            st.write(fig)
-            st.dataframe(closes[closes.index==symbol])
-    #p=plot_bokeh(into,outfrom,df)
+
+                    ex=ccxt.binance()
+
+
+                    symbol=st.sidebar.radio('Symbol',symbols)
+
+                     #tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
+                     #percent_price=st.number_input('Enter the % from price to calculate',1.0)
+                   #num_close=st.number_input('Enter the number of Closes to filter',0)
+
+                    df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+                    df['Date']=pd.to_datetime(df['Time']*1000000)
+
+                    strt=df['Date'].min()
+                    st.write('Data loaded from date '+str(strt))
+                    start_filter = st.text_input("The start of duration to check",'2021-08-11 23:00:00')
+                    start_filter=pd.Timestamp(start_filter)
+                    df=df[df['Date']>start_filter]
+
+                    price=df[df['Date']==df['Date'].max()].Close.max()
+                   #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
+                   #df=df.astype( dtype={
+
+                   #f=pd.DataFrame(ex.fetch_markets())
+
+                    print('scan')
+                   #df=OHLCV1[OHLCV1['symbol']==symbol]
+                    step=df.Close.max()*percent_price/100
+                   #fig=plot_hist(df,step)
+                    bins=np.arange(df.Close.min(), df.Close.max() + step, step)
+                    fig = px.histogram(df, x="Close",nbins=len(bins))
+                    fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
+
+                   #fig.show()
+                    st.write(fig)
+                    st.dataframe(closes[closes.index==symbol])
+            #p=plot_bokeh(into,outfrom,df)
     
     #st.bokeh_chart(p)
     #show(p)
