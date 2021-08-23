@@ -170,7 +170,7 @@ if program=='BTC_change':
             symbols=closes['symbol'].drop_duplicates().to_list()
             closes.set_index('symbol',inplace=True)
             
-            st.dataframe(closes)
+            
                 
                 
             ex=ccxt.binance()
@@ -206,7 +206,8 @@ if program=='BTC_change':
             fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
 
            #fig.show()
-            st.write(fig)    
+            st.write(fig)
+            st.dataframe(closes[closes['symbol']==symbol)
     #p=plot_bokeh(into,outfrom,df)
     
     #st.bokeh_chart(p)
