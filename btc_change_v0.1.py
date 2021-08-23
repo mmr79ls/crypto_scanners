@@ -145,7 +145,7 @@ if program=='BTC_change':
             symbols=['BTC/USDT','ICP/USDT','ETH/USDT','LTC/USDT','XRP/USDT']
             for symbol in symbols:# OHLCV1['symbol']:
                 df=OHLCV1[OHLCV1['symbol']==symbol]
-                st.dataframe(df)
+                #st.dataframe(df)
                 df=df[df['Date']>=start]  
                 step=percent_price*df.Close.max()/100
                 bins=np.arange(df.Close.min(), df.Close.max() + step, step)
