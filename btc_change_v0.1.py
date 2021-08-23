@@ -142,7 +142,7 @@ if program=='BTC_change':
             start=pd.Timestamp(start)
                       
             closes=pd.DataFrame()
-            symbols=['BTC/USDT','ICP/USDT','ETH/USDT','LTC/USDT','XRP/USDT']
+            symbols=OHLCV1['symbol'].unique()
             for symbol in symbols:# OHLCV1['symbol']:
                 df=OHLCV1[OHLCV1['symbol']==symbol]
                 #st.dataframe(df)
