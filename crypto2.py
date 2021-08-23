@@ -54,7 +54,7 @@ class crypto():
         symbols=[]
         for i in slist:
 
-            t=i.find('DOWN/' or 'UP/'or 'BULL/' or 'BEAR/')
+            t=i.find('DOWN/' or 'UP/'or 'BULL/' or 'BEAR/' or 'USDC/' or 'EUR/' or 'TUSD/' or 'BUSD/' or 'PAX/' or 'AUD/' or 'SUSD/' or 'GBP/' or 'PAXG/') 
             if(t==-1):
                 symbols.append(i)
         #symbols=pd.DataFrame(symb)
