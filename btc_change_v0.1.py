@@ -175,7 +175,7 @@ if program=='BTC_change':
                 
             ex=ccxt.binance()
             
-          
+            st.write(symbols)
             symbol=st.sidebar.radio('Symbol',symbols)
       
              #tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
