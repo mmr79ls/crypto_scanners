@@ -207,7 +207,7 @@ if program=='BTC_change':
 
            #fig.show()
             st.write(fig)
-            st.dataframe(closes.index==symbol])
+            st.dataframe(closes[closes.index==symbol])
     #p=plot_bokeh(into,outfrom,df)
     
     #st.bokeh_chart(p)
