@@ -307,9 +307,9 @@ if  program=='RSI':
            if flag2==1:
                caching.clear_cache()
                df_rsi=rsi()
-           ssymbols=df_rsi.groupby('symbol').RSI.count().sort_values(ascending =False)
-           st.dataframe(ssymbols)
-           symbol=st.sidebar.radio('Symbol',ssymbols.symbol)
+           ssymbols=df_rsi.groupby('symbol').RSI.count().sort_values(ascending =False).reset_index()
            
+           symbol=st.sidebar.radio('Symbol',ssymbols.symbol)
+           st.dataframe(ssymbols)
            st.dataframe(df_rsi[df_rsi['symbol']==symbol])
            
