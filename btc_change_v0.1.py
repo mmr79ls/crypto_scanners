@@ -13,7 +13,7 @@ import numpy as np
 import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,plot_bokeh,Volume_change
 from datetime import datetime
-
+from finta import TA
 import matplotlib.pyplot as plt
 from streamlit import caching
 import plotly.express as px
@@ -35,7 +35,51 @@ def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h
         into=outfrom=0
         OHLCV=a.get_OHLCV(time_tuple,tf)
         return OHLCV,into,outfrom
+@st.cache(allow_output_mutation=True)
+def scan_RSI(symbol,tf,RSI=40,flag=0):
+    df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=200))
+    df.columns=['Time','open','high','low','close','volume']
+    df['Date']=pd.to_datetime(df['Time']*1000000)
+    x=TA.RSI(df,9)
+    df['RSI']=x
+    count=0
+    indx=np.array([])
+    rng=np.array([])
+    indx1=[]
+    #rng1=[]
+    len1=[]
+    i=0
 
+    for i in range(len(x)):
+        if x[i]>RSI and x[i-1]<RSI:
+            if len(rng)>2:
+               # rng1.append(rng)
+                len1.append(len(rng))
+                indx1.append(indx)
+            indx=np.array([])
+            rng=np.array([])
+        if x[i]>RSI:
+            continue
+        if x[i]<RSI:
+            indx=np.append(indx,i)
+            rng=np.append(rng,x[i])
+            i+=1
+    rs=pd.DataFrame([indx1,len1]).T
+    rs.columns=['ind','count']
+    if flag==1:
+        #largest trend
+        
+        rs.sort_values('count',ascending=False)[:1].ind.to_list()[0][0]
+        i=rs.sort_values('count',ascending=False)[:1].index[0]
+        l=len(rs.sort_values('count',ascending=False)[:1].ind[i])
+        filter=rs.sort_values('count',ascending=False)[:1].ind.to_list()[0][0]
+        l=df[df.index>filter][:l-1]
+    elif flag==0:
+        #newest trend
+        i=rs.ind[len(rs)-1][0]
+        l=len(rs.ind[len(rs)-1])
+        l=df[df.index>i][:l-1]
+    return l
 def price_calculator():
 
         ex=ccxt.binance()
@@ -66,7 +110,7 @@ def price_calculator():
         print('profit is ',profit)
         print('profit in BTC ',profit_BTC)
         return change,profit,profit_BTC
-program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','Close_analysis'])
+program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','RSI'])
 if program=='Price_calculator':
     change,profit,profit_BTC=price_calculator()
 
@@ -215,7 +259,8 @@ if program=='BTC_change':
     
     #st.bokeh_chart(p)
     #show(p)
-if  program=='Close_analysis':
+                 
+if  program=='RSI':
                      
            ex=ccxt.binance()
            
@@ -233,39 +278,22 @@ if  program=='Close_analysis':
                  t=i.find('DOWN/' or 'UP/' or 'BULL/' or 'BEAR/')
                  if(t==-1):
                         symbols.append(i)
-        
+                        
+           
            #symbol=st.selectbox('Symbol',symbols)
-           symbol=st.sidebar.radio('Symbol',symbols)
+           #symbol=st.sidebar.radio('Symbol',symbols)
            tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
            percent_price=st.number_input('Enter the % from price to calculate',1.0)
            #num_close=st.number_input('Enter the number of Closes to filter',0)
-          
-           df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
-           df['Date']=pd.to_datetime(df['Time']*1000000)
+           tf='4h'
+           df_rsi=pd.DataFrame()
+           for symbol in symbols:
+                l=scan_RSI(symbol,tf,40,0)
+                l['symbol']=symbol
+                df_rsi=pd.concat([df_rsi,l]) 
+           symbol=st.sidebar.radio('Symbol',symbols)
            
-           strt=df['Date'].min()
-           st.write('Data loaded from '+str(strt))
-           start = st.text_input("The start of duration to check",'2021-08-11 20:00:00')
-           start=pd.Timestamp(start)
-           df=df[df['Date']>start]
-           
-           price=df[df['Date']==df['Date'].max()].Close.max()
-           #df=pd.DataFrame(client.get_historical_klines(symbol.replace("/",""),tf, duration),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
-           #df=df.astype( dtype={
-               
-           #f=pd.DataFrame(ex.fetch_markets())
-
-           print('scan')
-           #df=OHLCV1[OHLCV1['symbol']==symbol]
-           step=df.Close.max()*percent_price/100
-           #fig=plot_hist(df,step)
-           bins=np.arange(df.Close.min(), df.Close.max() + step, step)
-           #hist_values= np.histogram(df['Close'], bins= bins,range=(df.Close.min(), df.Close.max()))
-           #st.bar_chart(bins[1:],hist_values)
-         
-
-           fig = px.histogram(df, x="Close",nbins=len(bins))
-           fig.add_vline(x=price, line_width=3, line_dash="dash", line_color="red")
-
-           #fig.show()
-           st.write(fig)
+           ssymbols=df_rsi.groupby('symbol').RSI.count().sort_values(ascending =False)
+           symbol=st.sidebar.radio('Symbol',ssymbols.symbol)
+           st.dataframe(ssymbols)
+           st.dataframe(df_rsi[df_rsi['symbol']==symbol])
