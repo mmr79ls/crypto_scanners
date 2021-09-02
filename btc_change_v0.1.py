@@ -267,6 +267,8 @@ def rsi(RSI,flag):
     df_rsi=pd.DataFrame()
     for symbol in symbols:
                 l=scan_RSI(symbol,tf,RSI,flag)
+                if l==0:
+                        continue
                 l['symbol']=symbol
                 df_rsi=pd.concat([df_rsi,l])
     return df_rsi
