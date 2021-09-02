@@ -52,7 +52,7 @@ def scan_RSI(symbol,tf,RSI=40,flag=0):
 
     for i in range(len(x)):
         if x[i]>RSI and x[i-1]<RSI:
-            if len(rng)>2:
+            if len(rng)>4:
                # rng1.append(rng)
                 len1.append(len(rng))
                 indx1.append(indx)
