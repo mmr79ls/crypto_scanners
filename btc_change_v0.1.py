@@ -81,7 +81,7 @@ def scan_RSI(symbol,tf,RSI=40,flag=0):
                 l=len(rs.ind[len(rs)-1])
                 l=df[df.index>i][:l-1]
     else:
-        l=0
+        l=[]
     return l
 def price_calculator():
 
@@ -267,7 +267,7 @@ def rsi(RSI,flag):
     df_rsi=pd.DataFrame()
     for symbol in symbols:
                 l=scan_RSI(symbol,tf,RSI,flag)
-                if l==0:
+                if len(l)<=1:
                         continue
                 l['symbol']=symbol
                 df_rsi=pd.concat([df_rsi,l])
