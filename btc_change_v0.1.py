@@ -260,10 +260,10 @@ if program=='BTC_change':
     #st.bokeh_chart(p)
     #show(p)
 @st.cache(allow_output_mutation=True)                
-def rsi():
+def rsi(RSI,flag):
     df_rsi=pd.DataFrame()
     for symbol in symbols:
-                l=scan_RSI(symbol,tf,40,0)
+                l=scan_RSI(symbol,tf,RSI,flag)
                 l['symbol']=symbol
                 df_rsi=pd.concat([df_rsi,l])
     return df_rsi
@@ -295,8 +295,9 @@ if  program=='RSI':
            #num_close=st.number_input('Enter the number of Closes to filter',0)
            tf='4h'
            
-            
-           df_rsi=rsi()
+           RSI=st.number_input('Enter the RSI filter ',10)
+           flag=st.selectbox('for longest series select 1, for newest series select 0',[0,1])
+           df_rsi=rsi(RSI,flag)
            flag2=st.button('rescan again')
            if flag2==1:
                caching.clear_cache()
