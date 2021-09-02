@@ -66,20 +66,22 @@ def scan_RSI(symbol,tf,RSI=40,flag=0):
             i+=1
     rs=pd.DataFrame([indx1,len1]).T
     rs.columns=['ind','count']
-    st.write(len(rs))
-    if flag==1:
-        #largest trend
-        
-        rs.sort_values('count',ascending=False)[:1].ind.to_list()[0][0]
-        i=rs.sort_values('count',ascending=False)[:1].index[0]
-        l=len(rs.sort_values('count',ascending=False)[:1].ind[i])
-        filter=rs.sort_values('count',ascending=False)[:1].ind.to_list()[0][0]
-        l=df[df.index>filter][:l-1]
-    elif flag==0:
-        #newest trend
-        i=rs.ind[len(rs)-1][0]
-        l=len(rs.ind[len(rs)-1])
-        l=df[df.index>i][:l-1]
+    if len(rs)>0:
+            if flag==1:
+                #largest trend
+
+                rs.sort_values('count',ascending=False)[:1].ind.to_list()[0][0]
+                i=rs.sort_values('count',ascending=False)[:1].index[0]
+                l=len(rs.sort_values('count',ascending=False)[:1].ind[i])
+                filter=rs.sort_values('count',ascending=False)[:1].ind.to_list()[0][0]
+                l=df[df.index>filter][:l-1]
+            elif flag==0:
+                #newest trend
+                i=rs.ind[len(rs)-1][0]
+                l=len(rs.ind[len(rs)-1])
+                l=df[df.index>i][:l-1]
+    else:
+        l=0
     return l
 def price_calculator():
 
