@@ -259,7 +259,14 @@ if program=='BTC_change':
     
     #st.bokeh_chart(p)
     #show(p)
-                 
+@st.cache(allow_output_mutation=True)                
+def rsi():
+    df_rsi=pd.DataFrame()
+    for symbol in symbols:
+                l=scan_RSI(symbol,tf,40,0)
+                l['symbol']=symbol
+                df_rsi=pd.concat([df_rsi,l])
+    return df_rsi
 if  program=='RSI':
                      
            ex=ccxt.binance()
@@ -283,17 +290,19 @@ if  program=='RSI':
            #symbol=st.selectbox('Symbol',symbols)
            #symbol=st.sidebar.radio('Symbol',symbols)
            tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
-           percent_price=st.number_input('Enter the % from price to calculate',1.0)
+           
+           #percent_price=st.number_input('Enter the % from price to calculate',1.0)
            #num_close=st.number_input('Enter the number of Closes to filter',0)
            tf='4h'
-           df_rsi=pd.DataFrame()
-           for symbol in symbols:
-                l=scan_RSI(symbol,tf,40,0)
-                l['symbol']=symbol
-                df_rsi=pd.concat([df_rsi,l]) 
-           symbol=st.sidebar.radio('Symbol',symbols)
            
+            
+           df_rsi=rsi()
+           flag2=st.button('rescan again')
+           if flag2==1:
+               caching.clear_cache()
+               df_rsi=rsi()
            ssymbols=df_rsi.groupby('symbol').RSI.count().sort_values(ascending =False)
            symbol=st.sidebar.radio('Symbol',ssymbols.symbol)
            st.dataframe(ssymbols)
            st.dataframe(df_rsi[df_rsi['symbol']==symbol])
+           
