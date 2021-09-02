@@ -66,6 +66,7 @@ def scan_RSI(symbol,tf,RSI=40,flag=0):
             i+=1
     rs=pd.DataFrame([indx1,len1]).T
     rs.columns=['ind','count']
+    st.write(len(rs))
     if flag==1:
         #largest trend
         
