@@ -329,7 +329,7 @@ if  program=='RSI':
            flag2=st.button('rescan again')
            if flag2==1:
                caching.clear_cache()
-               df_rsi=rsi()
+               df_rsi=rsi(tf,RSI,flag,starttime,end,trend)
            ssymbols=df_rsi.groupby('symbol').RSI.count().sort_values(ascending =False).reset_index()
            
            symbol=st.sidebar.radio('Symbol',ssymbols.symbol)
