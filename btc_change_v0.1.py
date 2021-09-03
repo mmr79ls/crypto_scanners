@@ -36,10 +36,12 @@ def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h
         OHLCV=a.get_OHLCV(time_tuple,tf)
         return OHLCV,into,outfrom
 @st.cache(allow_output_mutation=True)
-def scan_RSI(symbol,tf,RSI=40,flag=0):
-    df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=200))
+def scan_RSI(symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-09-03 00:00:00',trend=1):
+    start_date=ex.parse8601(starttime) 
+    df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,since=start_date))
     df.columns=['Time','open','high','low','close','volume']
     df['Date']=pd.to_datetime(df['Time']*1000000)
+    df=df[df['Date']<end]
     x=TA.RSI(df,9)
     df['RSI']=x
     count=0
@@ -49,21 +51,37 @@ def scan_RSI(symbol,tf,RSI=40,flag=0):
     #rng1=[]
     len1=[]
     i=0
-
-    for i in range(len(x)):
-        if x[i]>RSI and x[i-1]<RSI:
-            if len(rng)>4:
-               # rng1.append(rng)
-                len1.append(len(rng))
-                indx1.append(indx)
-            indx=np.array([])
-            rng=np.array([])
-        if x[i]>RSI:
-            continue
-        if x[i]<RSI:
-            indx=np.append(indx,i)
-            rng=np.append(rng,x[i])
-            i+=1
+    if trend==0:
+            for i in range(len(x)):
+                if x[i]>RSI and x[i-1]<RSI:
+                    if len(rng)>4:
+                       # rng1.append(rng)
+                        len1.append(len(rng))
+                        indx1.append(indx)
+                    indx=np.array([])
+                    rng=np.array([])
+                if x[i]>RSI:
+                    continue
+                if x[i]<RSI:
+                    indx=np.append(indx,i)
+                    rng=np.append(rng,x[i])
+                    i+=1
+    elif trend==1:
+                for i in range(len(x)):
+                if x[i]<RSI and x[i-1]>RSI:
+                    if len(rng)>4:
+                       # rng1.append(rng)
+                        len1.append(len(rng))
+                        indx1.append(indx)
+                    indx=np.array([])
+                    rng=np.array([])
+                if x[i]<RSI:
+                    continue
+                if x[i]>RSI:
+                    indx=np.append(indx,i)
+                    rng=np.append(rng,x[i])
+                    i+=1
+       
     rs=pd.DataFrame([indx1,len1]).T
     rs.columns=['ind','count']
     if len(rs)>0:
@@ -263,10 +281,11 @@ if program=='BTC_change':
     #st.bokeh_chart(p)
     #show(p)
 @st.cache(allow_output_mutation=True)                
-def rsi(RSI,flag):
+def rsi(tf,RSI,flag,starttime,end,trend):
     df_rsi=pd.DataFrame()
     for symbol in symbols:
-                l=scan_RSI(symbol,tf,RSI,flag)
+                l=scan_RSI(symbol,tf,RSI,flag,starttime,end,trend)
+                
                 if len(l)<=1:
                         continue
                 l['symbol']=symbol
@@ -302,7 +321,11 @@ if  program=='RSI':
            
            RSI=st.number_input('Enter the RSI filter ',10)
            flag=st.selectbox('for longest series select 1, for newest series select 0',[0,1])
-           df_rsi=rsi(RSI,flag)
+           symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-09-03 00:00:00',trend=1
+           starttime=st.text_input('Enter the start of period to search for','2021-09-01 00:00:00')
+           end=st.text_input('Enter the end of period to search for','2021-09-02 00:00:00')
+           trend=st.selectbox('for up trend select 1 , for downtrend select 0',[0,1])
+           df_rsi=rsi(tf,RSI,flag,starttime,end,trend)
            flag2=st.button('rescan again')
            if flag2==1:
                caching.clear_cache()
