@@ -67,7 +67,7 @@ def scan_RSI(symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-0
                     rng=np.append(rng,x[i])
                     i+=1
     elif trend==1:
-                for i in range(len(x)):
+            for i in range(len(x)):
                 if x[i]<RSI and x[i-1]>RSI:
                     if len(rng)>4:
                        # rng1.append(rng)
