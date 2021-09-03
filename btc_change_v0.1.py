@@ -321,7 +321,7 @@ if  program=='RSI':
            
            RSI=st.number_input('Enter the RSI filter ',10)
            flag=st.selectbox('for longest series select 1, for newest series select 0',[0,1])
-           symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-09-03 00:00:00',trend=1
+           
            starttime=st.text_input('Enter the start of period to search for','2021-09-01 00:00:00')
            end=st.text_input('Enter the end of period to search for','2021-09-02 00:00:00')
            trend=st.selectbox('for up trend select 1 , for downtrend select 0',[0,1])
