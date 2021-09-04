@@ -40,10 +40,12 @@ def scan_RSI(symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-0
     start_date=ex.parse8601(starttime) 
     df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,since=start_date))
     df.columns=['Time','open','high','low','close','volume']
+    df['price_delta']=(df.close-df.open)*100/df.close
+    
     df['Date']=pd.to_datetime(df['Time']*1000000)
     df=df[df['Date']<end]
-    x=TA.RSI(df,9)
-    df['RSI']=x
+    df['RSI']=TA.RSI(df,9)
+    df['RSI_delta']=(df.RSI-df.RSI.shift(1))*100/df.RSI
     count=0
     indx=np.array([])
     rng=np.array([])
