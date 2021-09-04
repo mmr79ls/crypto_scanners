@@ -44,7 +44,8 @@ def scan_RSI(symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-0
     
     df['Date']=pd.to_datetime(df['Time']*1000000)
     df=df[df['Date']<end]
-    df['RSI']=TA.RSI(df,9)
+    x=TA.RSI(df,9)
+    df['RSI']=x
     df['RSI_delta']=(df.RSI-df.RSI.shift(1))*100/df.RSI
     count=0
     indx=np.array([])
