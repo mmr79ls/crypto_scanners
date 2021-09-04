@@ -327,7 +327,7 @@ if  program=='RSI':
            
            starttime=st.text_input('Enter the start of period to search for','2021-09-01 00:00:00')
            end=st.text_input('Enter the end of period to search for','2021-09-02 00:00:00')
-           trend=st.selectbox('for up trend select 1 , for downtrend select 0',[0,1])
+           trend=st.selectbox('for up trend select 1  (>70) , for downtrend select 0  (<40)',[0,1])
            df_rsi=rsi(tf,RSI,flag,starttime,end,trend)
            flag2=st.button('rescan again')
            if flag2==1:
