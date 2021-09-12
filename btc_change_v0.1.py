@@ -338,4 +338,59 @@ if  program=='RSI':
            symbol=st.sidebar.radio('Symbol',ssymbols.symbol)
            st.dataframe(ssymbols)
            st.dataframe(df_rsi[df_rsi['symbol']==symbol])
+ def comp_prev(a,shift=1):
+        return (a.Close-a.Close.shift(shift))*100/a.Close          
+ if  program=='candle_search':
+                     
+           ex=ccxt.binance()
            
+           f=pd.DataFrame(ex.fetch_markets())
+           symbs=f[f['active']==True].symbol.unique()
+
+           s=[]
+           u=[]
+           for symbol in symbs:
+          
+              if symbol.split('/')[1]=='USDT':
+                u.append(symbol)
+           symbols=[]        
+           for i in u:
+                 t=i.find('DOWN/' or 'UP/' or 'BULL/' or 'BEAR/')
+                 if(t==-1):
+                        symbols.append(i)
+                        
+           
+           #symbol=st.selectbox('Symbol',symbols)
+           #symbol=st.sidebar.radio('Symbol',symbols)
+           tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
+           starttime=st.text_input('Enter the start of period to search for','2021-09-01 00:00:00')
+           
+           end=st.text_input('Enter the end of period to search for','2021-09-02 00:00:00')
+           candle=st.number_input('enter the candle change %',0.0)
+           end=pd.Timestamp(end)
+           
+           def get_ohlcv_candle(symbols,starttime,end,candle,tf):
+               OHLCV1=pd.DataFrame()
+               since=ex.parse8601(starttime)
+               for symbol in symbols:
+                    a=pd.DataFrame(ex.fetch_ohlcv (symbol,tf, since=since),columns=['Time','Open','High','Low','Close','Volume'])
+                   
+                    a['change']= comp_prev(a)
+                    a=a[abs(a['change'])>=candle]
+                    if len(a):
+                         a['Date']=pd.to_datetime(a['Time']*1000000)
+                         a['symbol']=symbol
+                         OHLCV1=pd.concat([a,OHLCV1],ignore_index=True)
+               OHLCV1=OHLCV1.set_index('Date')
+               OHLCV1=OHLCV1[(OHLCV1.index>=starttime) & (OHLCV1.index<=end)]
+               
+               return OHLCV1
+               
+           df=get_ohlcv_candle(symbols,starttime,end,candle,tf)
+           
+           flag2=st.button('rescan again')
+           if flag2==1:
+               caching.clear_cache()
+               df=get_ohlcv_candle(symbols,starttime,end,candle,tf)
+          
+           st.dataframe(df)
