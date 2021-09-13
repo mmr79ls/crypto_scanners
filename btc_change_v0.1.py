@@ -134,7 +134,7 @@ def price_calculator():
         print('profit is ',profit)
         print('profit in BTC ',profit_BTC)
         return change,profit,profit_BTC
-program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','RSI','candle_search])
+program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','RSI','candle_search'])
 if program=='Price_calculator':
     change,profit,profit_BTC=price_calculator()
 
