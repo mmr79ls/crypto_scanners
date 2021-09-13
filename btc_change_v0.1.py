@@ -134,7 +134,7 @@ def price_calculator():
         print('profit is ',profit)
         print('profit in BTC ',profit_BTC)
         return change,profit,profit_BTC
-program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','RSI'])
+program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','RSI','candle_search])
 if program=='Price_calculator':
     change,profit,profit_BTC=price_calculator()
 
@@ -338,9 +338,9 @@ if  program=='RSI':
            symbol=st.sidebar.radio('Symbol',ssymbols.symbol)
            st.dataframe(ssymbols)
            st.dataframe(df_rsi[df_rsi['symbol']==symbol])
- def comp_prev(a,shift=1):
+def comp_prev(a,shift=1):
         return (a.Close-a.Close.shift(shift))*100/a.Close          
- if  program=='candle_search':
+if  program=='candle_search':
                      
            ex=ccxt.binance()
            
