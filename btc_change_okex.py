@@ -12,7 +12,7 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 import seaborn as sns
-from crypto_func import BTC_drop_change,group_tweets,plot_bokeh,Volume_change
+from crypto_func import BTC_drop_change,group_tweets,Volume_change
 from datetime import datetime
 from finta import TA
 import matplotlib.pyplot as plt
