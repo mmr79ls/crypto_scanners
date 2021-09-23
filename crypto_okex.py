@@ -16,13 +16,13 @@ import time
 from time import struct_time
 
 from math import pi
-from bokeh.plotting import figure
-from bokeh.io import output_notebook, show
-from bokeh.resources import INLINE
-from bokeh.models import LinearAxis, Range1d,HBar,HoverTool
-from bokeh.models import ColumnDataSource, Label, LabelSet, Range1d
-output_notebook(resources=INLINE)
-from bokeh.plotting import figure, output_file, show
+#from bokeh.plotting import figure
+#from bokeh.io import output_notebook, show
+#rom bokeh.resources import INLINE
+#from bokeh.models import LinearAxis, Range1d,HBar,HoverTool
+#from bokeh.models import ColumnDataSource, Label, LabelSet, Range1d
+#output_notebook(resources=INLINE)
+#from bokeh.plotting import figure, output_file, show
 import tweepy
 import re
 
@@ -389,7 +389,7 @@ class crypto():
               self.into=into
               self.outfrom=outfrom
 
-    def plot_bokeh(self,into,outfrom,df):
+'''    def plot_bokeh(self,into,outfrom,df):
               #into=self.into
               #outfrom=self.outfrom
               output_file("label.html", title="label.py example")
@@ -422,4 +422,4 @@ class crypto():
               #p.add_layout(labels)
 
 
-              show(p)
+              show(p)'''
