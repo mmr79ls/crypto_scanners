@@ -17,7 +17,7 @@ from datetime import datetime
 from finta import TA
 import matplotlib.pyplot as plt
 from streamlit import caching
- import streamlit_analytics
+import streamlit_analytics
 
 import plotly.express as px
 hide_streamlit_style = """
