@@ -17,6 +17,8 @@ from datetime import datetime
 from finta import TA
 import matplotlib.pyplot as plt
 from streamlit import caching
+ import streamlit_analytics
+
 import plotly.express as px
 hide_streamlit_style = """
 <style>
@@ -145,8 +147,7 @@ if program=='Price_calculator':
 
 
 if program=='BTC_change':
-    import streamlit_analytics
-
+   
         with streamlit_analytics.track():    
             quote=st.selectbox('Symbol',['USDT','BTC'])
             exchange=st.selectbox('Exchange',['binance','okex','gateio'])
