@@ -14,7 +14,7 @@ import numpy as np
 import seaborn as sns
 from crypto_func import BTC_drop_change,group_tweets,Volume_change
 from datetime import datetime
-from finta import TA
+#from finta import TA
 import matplotlib.pyplot as plt
 from streamlit import caching
 import plotly.express as px
