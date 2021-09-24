@@ -259,7 +259,7 @@ if program=='BTC_change':
              #percent_price=st.number_input('Enter the % from price to calculate',1.0)
            #num_close=st.number_input('Enter the number of Closes to filter',0)
 
-            df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=10000),columns=['Time','Open','High','Low','Close','Volume'])
+            df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,limit=1000),columns=['Time','Open','High','Low','Close','Volume'])
             df['Date']=pd.to_datetime(df['Time']*1000000)
 
             #strt=df['Date'].min()
