@@ -10,7 +10,7 @@ from math import pi
 #from bokeh.resources import INLINE
 #from bokeh.models import LinearAxis, Range1d,HBar,HoverTool
 #from bokeh.models import ColumnDataSource, Label, LabelSet, Range1d
-output_notebook(resources=INLINE)
+#output_notebook(resources=INLINE)
 #from bokeh.plotting import figure, output_file, show
 import tweepy
 import re
