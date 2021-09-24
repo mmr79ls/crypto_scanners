@@ -191,11 +191,11 @@ class crypto():
         exchange=self.exchanges#ccxt.binance()
         #exchange=st.selectbox('Exchange',['binance','okex','gateio'])
         if exchange=='binance':
-            ex=ccxt.binance()
+            exchange=ccxt.binance()
         elif exchange=='okex':    
-            ex=ccxt.okex()
+            exchange=ccxt.okex()
         elif exchange=='gateio':
-            ex=ccxt.gateio()
+            exchange=ccxt.gateio()
         exchange.load_markets()
         OHLCV=pd.DataFrame()
         print(OHLCV)
