@@ -6,7 +6,7 @@ bokeh == 2.4.0
 # C:\Users\mraslan\Downloads\project\crypto1.py: 3
 # C:\Users\mraslan\Downloads\project\scanner_v0.1.py: 3
 ccxt == 1.56.84
-
+streamlit-analytics == 0.2.2
 # C:\Users\mraslan\Downloads\project\crypto1.py: 5
 # C:\Users\mraslan\Downloads\project\scanner_v0.1.py: 7
 numpy == 1.19.2
