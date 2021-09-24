@@ -111,7 +111,7 @@ def price_calculator():
         elif exchange=='okex':    
             ex=ccxt.okex()
         elif exchange=='gateio':
-            ex=ccxt.gatio()
+            ex=ccxt.gateio()
         df_BTC=pd.DataFrame(ex.fetch_ohlcv('BTC/USDT','1h',limit=1),columns=['Time','Open','High','Low','Close','Volume'])
         btc_price=df_BTC.Close.values[0]
         f=pd.DataFrame(ex.fetch_markets())
