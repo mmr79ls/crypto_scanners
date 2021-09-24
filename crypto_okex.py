@@ -189,6 +189,13 @@ class crypto():
         starttime=time.mktime(self.time_obj)*1000
         #my_bar = st.progress(0)
         exchange=self.exchanges#ccxt.binance()
+                exchange=st.selectbox('Exchange',['binance','okex','gateio'])
+        if exchange=='binance':
+            ex=ccxt.binance()
+        elif exchange=='okex':    
+            ex=ccxt.okex()
+        elif exchange=='gateio':
+            ex=ccxt.gateio()
         exchange.load_markets()
         OHLCV=pd.DataFrame()
         print(OHLCV)
