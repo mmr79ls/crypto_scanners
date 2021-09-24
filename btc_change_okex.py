@@ -307,7 +307,7 @@ if  program=='RSI':
            elif exchange=='okex':    
                ex=ccxt.okex()
            elif exchange=='gateio':
-               ex=ccxt.gatio()
+               ex=ccxt.gateio()
            
            f=pd.DataFrame(ex.fetch_markets())
            symbs=f[f['active']==True].symbol.unique()
@@ -359,7 +359,7 @@ if  program=='candle_search':
            elif exchange=='okex':    
                ex=ccxt.okex()
            elif exchange=='gateio':
-               ex=ccxt.gatio()
+               ex=ccxt.gateio()
            
            f=pd.DataFrame(ex.fetch_markets())
            symbs=f[f['active']==True].symbol.unique()
