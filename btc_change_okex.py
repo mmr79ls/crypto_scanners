@@ -12,7 +12,7 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 import seaborn as sns
-from crypto_func import BTC_drop_change,group_tweets,Volume_change
+from crypto_func import BTC_drop_change,group_tweets,plot_bokeh,Volume_change
 from datetime import datetime
 from finta import TA
 import matplotlib.pyplot as plt
@@ -26,8 +26,8 @@ footer {visibility: hidden;}
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 @st.cache(allow_output_mutation=True)
-def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h'):
-        a=crypto('okex',quote)  
+def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h',exchange='binance'):
+        a=crypto(exchange,quote)  
         
         #df_tweet=a.get_tweets()
         #time_tuple=(2021, 3, 30, 00, 00, 00, 0, 00, 0)
@@ -36,7 +36,7 @@ def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h
         OHLCV=a.get_OHLCV(time_tuple,tf)
         return OHLCV,into,outfrom
 @st.cache(allow_output_mutation=True)
-def scan_RSI(symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-09-03 00:00:00',trend=1):
+def scan_RSI(ex,symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-09-03 00:00:00',trend=1):
     start_date=ex.parse8601(starttime) 
     df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf,since=start_date))
     df.columns=['Time','open','high','low','close','volume']
@@ -105,8 +105,13 @@ def scan_RSI(symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='2021-0
         l=[]
     return l
 def price_calculator():
-
-        ex=ccxt.okex()
+        exchange=st.selectbox('Exchange',['binance','okex','gateio'])
+        if exchange=='binance':
+            ex=ccxt.binance()
+        elif exchange=='okex':    
+            ex=ccxt.okex()
+        elif exchange=='gateio':
+            ex=ccxt.gatio()
         df_BTC=pd.DataFrame(ex.fetch_ohlcv('BTC/USDT','1h',limit=1),columns=['Time','Open','High','Low','Close','Volume'])
         btc_price=df_BTC.Close.values[0]
         f=pd.DataFrame(ex.fetch_markets())
@@ -142,6 +147,7 @@ if program=='Price_calculator':
 if program=='BTC_change':
 
     quote=st.selectbox('Symbol',['USDT','BTC'])
+    exchange=st.selectbox('Exchange',['binance','okex','gateio'])
     #percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
     flag=st.button('rescan again')
     if flag==1:
@@ -150,7 +156,7 @@ if program=='BTC_change':
 
     
         time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0)
-        OHLCV1,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h') 
+        OHLCV1,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h',exchange) 
         
     percentage=1
 
@@ -159,7 +165,7 @@ if program=='BTC_change':
     coin=st.text_input('Enter the coin you want to check from whale bot','BTC')
     print(coin)
     tf=st.text_input('Time frame (1m/1h/4h/1d/1w)','1h')
-    OHLCV1,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h')
+    OHLCV1,into,outfrom=OHLCV(percentage,quote,time_tuple,'1h',exchange)
     st.write('BTC price change')
     choice=st.selectbox('',['Change % check','volume filter','Close_analysis'])
     if choice=='Change % check':
@@ -284,10 +290,10 @@ if program=='BTC_change':
     #st.bokeh_chart(p)
     #show(p)
 @st.cache(allow_output_mutation=True)                
-def rsi(tf,RSI,flag,starttime,end,trend):
+def rsi(ex,tf,RSI,flag,starttime,end,trend):
     df_rsi=pd.DataFrame()
     for symbol in symbols:
-                l=scan_RSI(symbol,tf,RSI,flag,starttime,end,trend)
+                l=scan_RSI(ex,symbol,tf,RSI,flag,starttime,end,trend)
                 
                 if len(l)<=1:
                         continue
@@ -295,8 +301,13 @@ def rsi(tf,RSI,flag,starttime,end,trend):
                 df_rsi=pd.concat([df_rsi,l])
     return df_rsi
 if  program=='RSI':
-                     
-           ex=ccxt.okex()
+           exchange=st.selectbox('Exchange',['binance','okex','gateio'])
+           if exchange=='binance':
+               ex=ccxt.binance()
+           elif exchange=='okex':    
+               ex=ccxt.okex()
+           elif exchange=='gateio':
+               ex=ccxt.gatio()
            
            f=pd.DataFrame(ex.fetch_markets())
            symbs=f[f['active']==True].symbol.unique()
@@ -328,11 +339,11 @@ if  program=='RSI':
            starttime=st.text_input('Enter the start of period to search for','2021-09-01 00:00:00')
            end=st.text_input('Enter the end of period to search for','2021-09-02 00:00:00')
            trend=st.selectbox('for up trend select 1  (>70) , for downtrend select 0  (<40)',[0,1])
-           df_rsi=rsi(tf,RSI,flag,starttime,end,trend)
+           df_rsi=rsi(ex,tf,RSI,flag,starttime,end,trend)
            flag2=st.button('rescan again')
            if flag2==1:
                caching.clear_cache()
-               df_rsi=rsi(tf,RSI,flag,starttime,end,trend)
+               df_rsi=rsi(ex,tf,RSI,flag,starttime,end,trend)
            ssymbols=df_rsi.groupby('symbol').RSI.count().sort_values(ascending =False).reset_index()
            
            symbol=st.sidebar.radio('Symbol',ssymbols.symbol)
@@ -342,7 +353,13 @@ def comp_prev(a,shift=1):
         return (a.Close-a.Close.shift(shift))*100/a.Close          
 if  program=='candle_search':
                      
-           ex=ccxt.okex()
+           exchange=st.selectbox('Exchange',['binance','okex','gateio'])
+           if exchange=='binance':
+               ex=ccxt.binance()
+           elif exchange=='okex':    
+               ex=ccxt.okex()
+           elif exchange=='gateio':
+               ex=ccxt.gatio()
            
            f=pd.DataFrame(ex.fetch_markets())
            symbs=f[f['active']==True].symbol.unique()
@@ -369,7 +386,7 @@ if  program=='candle_search':
            candle=st.number_input('enter the candle change %',0.0)
            end=pd.Timestamp(end)
            
-           def get_ohlcv_candle(symbols,starttime,end,candle,tf):
+           def get_ohlcv_candle(ex,symbols,starttime,end,candle,tf):
                OHLCV1=pd.DataFrame()
                since=ex.parse8601(starttime)
                for symbol in symbols:
@@ -386,11 +403,11 @@ if  program=='candle_search':
                
                return OHLCV1
                
-           df=get_ohlcv_candle(symbols,starttime,end,candle,tf)
+           df=get_ohlcv_candle(ex,symbols,starttime,end,candle,tf)
            
            flag2=st.button('rescan again')
            if flag2==1:
                caching.clear_cache()
-               df=get_ohlcv_candle(symbols,starttime,end,candle,tf)
+               df=get_ohlcv_candle(ex,symbols,starttime,end,candle,tf)
           
            st.dataframe(df)

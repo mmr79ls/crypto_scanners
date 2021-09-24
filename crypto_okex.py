@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Sep 23 17:07:14 2021
-
-@author: mraslan
-"""
-
 import ccxt
 import pandas as pd
 import numpy as np
@@ -16,23 +9,23 @@ import time
 from time import struct_time
 
 from math import pi
-#from bokeh.plotting import figure
-#from bokeh.io import output_notebook, show
-#rom bokeh.resources import INLINE
-#from bokeh.models import LinearAxis, Range1d,HBar,HoverTool
-#from bokeh.models import ColumnDataSource, Label, LabelSet, Range1d
-#output_notebook(resources=INLINE)
-#from bokeh.plotting import figure, output_file, show
+from bokeh.plotting import figure
+from bokeh.io import output_notebook, show
+from bokeh.resources import INLINE
+from bokeh.models import LinearAxis, Range1d,HBar,HoverTool
+from bokeh.models import ColumnDataSource, Label, LabelSet, Range1d
+output_notebook(resources=INLINE)
+from bokeh.plotting import figure, output_file, show
 import tweepy
 import re
 
 
 class crypto():
-    def __init__(self, exchange=['okex'],quote='USDT'):
-      self.exchanges = ['okex']
+    def __init__(self, exchange=['binance'],quote='USDT'):
+      self.exchanges = exchange
       #self.step_percentage = step_percentage
       self.quote=quote
-      Bitfinex = ccxt.okex()
+      Bitfinex = ccxt.binance()
       markets = Bitfinex.load_markets ()
       self.btc_usdt=pd.DataFrame(Bitfinex.fetch_ticker('BTC/USDT')).close[0]
       self.flag=0
@@ -155,7 +148,7 @@ class crypto():
             self.bid_filtered=self.bid[self.bid['amount_USDT']>float(USDT)]
         return self.ask_filtered,self.bid_filtered
 
-    def draw_bidask(self,symbol='BTC/USDT',exchange=['okex']):
+    def draw_bidask(self,symbol='BTC/USDT',exchange=['binance']):
           sns.set(rc={'figure.figsize':(200,150)})
           self.symbol=symbol
           a=self.ask[self.ask['symbol']==self.symbol].copy()
@@ -194,8 +187,8 @@ class crypto():
         #self.symbols=symbol
 
         starttime=time.mktime(self.time_obj)*1000
-        my_bar = st.progress(0)
-        exchange=ccxt.okex()
+        #my_bar = st.progress(0)
+        exchange=self.exchanges#ccxt.binance()
         exchange.load_markets()
         OHLCV=pd.DataFrame()
         print(OHLCV)
@@ -226,7 +219,7 @@ class crypto():
                 since = exchange.milliseconds () - (80*86400000)
                 count+=1
                 print(count,'/',lenght)
-                my_bar.progress(count/lenght)
+               # my_bar.progress(count/lenght)
                 time.sleep (exchange.rateLimit / 2000)
                 a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =10000,since=since),columns=['Time','Open','High','Low','Close','Volume'])
                 a['Date']=pd.to_datetime(a['Time']*1000000)
@@ -270,7 +263,7 @@ class crypto():
             self.history=history
             self.symbol=symbol
             shift=self.history*60*60*1000
-            exchange=ccxt.okex()
+            exchange=self.exchanges#ccxt.binance()
             exchange.load_markets()
             #symbol='BTC/USDT'
             if exchange.has['fetchTrades']:
@@ -389,7 +382,7 @@ class crypto():
               self.into=into
               self.outfrom=outfrom
 
-'''    def plot_bokeh(self,into,outfrom,df):
+    def plot_bokeh(self,into,outfrom,df):
               #into=self.into
               #outfrom=self.outfrom
               output_file("label.html", title="label.py example")
@@ -422,4 +415,4 @@ class crypto():
               #p.add_layout(labels)
 
 
-              show(p)'''
+              show(p)
