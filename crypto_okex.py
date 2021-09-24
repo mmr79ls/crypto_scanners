@@ -218,7 +218,7 @@ class crypto():
             for symbol in symbols:
                 # time.sleep wants seconds
                 since = exchange.milliseconds () - (40*86400000)
-                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =10000,since=since),columns=['Time','Open','High','Low','Close','Volume'])
+                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =1000,since=since),columns=['Time','Open','High','Low','Close','Volume'])
                 a['Date']=pd.to_datetime(a['Time']*1000000)
                 a['symbol']=symbol
                 a['change']=self.comp_prev(a)
@@ -228,7 +228,7 @@ class crypto():
                 print(count,'/',lenght)
                # my_bar.progress(count/lenght)
                 time.sleep (exchange.rateLimit / 2000)
-                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =10000,since=since),columns=['Time','Open','High','Low','Close','Volume'])
+                a=pd.DataFrame(exchange.fetch_ohlcv (symbol, self.timeframe,limit =1000,since=since),columns=['Time','Open','High','Low','Close','Volume'])
                 a['Date']=pd.to_datetime(a['Time']*1000000)
                 a['symbol']=symbol
                 a['change']=self.comp_prev(a)
