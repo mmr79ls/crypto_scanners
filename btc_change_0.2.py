@@ -249,16 +249,11 @@ if program=='BTC_change':
                     closes=closes.sort_values('count',ascending=False)
                     symbols=closes['symbol'].drop_duplicates().to_list()
                     closes.set_index('symbol',inplace=True)
-
-
-
-
-            #ex=ccxt.okex()
-                   if exchange=='binance':
+                    if exchange=='binance':
                        ex=ccxt.binance()
-                   elif exchange=='okex':    
+                    elif exchange=='okex':    
                        ex=ccxt.okex()
-                   elif exchange=='gateio':
+                    elif exchange=='gateio':
                        ex=ccxt.gateio()
 
                     symbol=st.sidebar.radio('Symbol',symbols)
