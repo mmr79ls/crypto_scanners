@@ -433,11 +433,11 @@ if  program=='candle_search':
                 return OHLCV1
                
            #df=get_ohlcv_candle(ex,symbols,starttime,end,candle,tf)
-           df=get_ohlcv_candle(ubra,symbol,tf,start,delta_filter,starttime,end,candle)
+           df=get_ohlcv_candle(ubra,symbols,tf,start,delta_filter,starttime,end,candle)
            flag2=st.button('rescan again')
            if flag2==1:
                caching.clear_cache()
                #df=get_ohlcv_candle(ex,symbols,starttime,end,candle,tf)
-               df=get_ohlcv_candle(ubra,symbol,tf,start,delta_filter,starttime,end,candle)
+               df=get_ohlcv_candle(ubra,symbols,tf,start,delta_filter,starttime,end,candle)
           
            st.dataframe(df)
