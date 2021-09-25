@@ -7,7 +7,7 @@ Created on Thu Sep 23 17:05:54 2021
 
 
 import ccxt
-from crypto_okex import crypto
+from crypto2 import crypto
 import pandas as pd
 import streamlit as st
 import numpy as np
