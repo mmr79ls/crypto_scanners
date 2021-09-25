@@ -17,7 +17,7 @@ from datetime import datetime
 from finta import TA
 import matplotlib.pyplot as plt
 from streamlit import caching
-import streamlit_analytics
+#import streamlit_analytics
 from unicorn_binance_rest_api.unicorn_binance_rest_api_manager import BinanceRestApiManager
      
 import plotly.express as px
@@ -149,7 +149,7 @@ if program=='Price_calculator':
 
 if program=='BTC_change':
    
-        with streamlit_analytics.track():    
+       # with streamlit_analytics.track():    
             quote=st.selectbox('Symbol',['USDT','BTC'])
             exchange=st.selectbox('Exchange',['binance','okex','gateio'])
             #percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
