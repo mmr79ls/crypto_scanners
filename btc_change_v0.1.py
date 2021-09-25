@@ -399,6 +399,7 @@ if  program=='candle_search':
                 start_str=start+' ago UTC'
                 OHLCV1=pd.DataFrame()
                 for symbol in symbols:
+                          symbol=symbol.replace("/","")
                           df=pd.DataFrame(ubra.get_historical_klines(symbol=symbol,interval=interval,start_str=start_str),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
                           df=df.astype( dtype={
                                'Open': float,
