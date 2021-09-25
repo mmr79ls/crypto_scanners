@@ -5,7 +5,8 @@ Created on Thu Sep 23 17:05:54 2021
 @author: mraslan
 """
 
-
+from unicorn_binance_rest_api.unicorn_binance_rest_api_manager import BinanceRestApiManager
+     
 import ccxt
 from crypto_okex import crypto
 import pandas as pd
