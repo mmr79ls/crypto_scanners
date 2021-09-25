@@ -426,7 +426,7 @@ if  program=='candle_search':
                           df=df[abs(df['change'])>=candle]
                           df=df[abs(df['Delta'])>=delta_filter]
                           df['percentage']=df['Delta']*100/df['Quote asset volume']
-                OHLCV1=pd.concat([a,OHLCV1],ignore_index=True)
+                OHLCV1=pd.concat([df,OHLCV1],ignore_index=True)
                 OHLCV1=OHLCV1.set_index('Date')
                 OHLCV1=OHLCV1[(OHLCV1.index>=starttime) & (OHLCV1.index<=end)]
 
