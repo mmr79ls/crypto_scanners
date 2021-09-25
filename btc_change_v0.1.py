@@ -18,7 +18,8 @@ from finta import TA
 import matplotlib.pyplot as plt
 from streamlit import caching
 import streamlit_analytics
-
+from unicorn_binance_rest_api.unicorn_binance_rest_api_manager import BinanceRestApiManager
+     
 import plotly.express as px
 hide_streamlit_style = """
 <style>
@@ -392,8 +393,9 @@ if  program=='candle_search':
            delta_filter=st.number_input('enter the Delta to filter %',0.0)
            end=pd.Timestamp(end)
            start=st.text_input('the history you need  x days ago','2 days')
+           ubra = BinanceRestApiManager()
            #def get_ohlcv_candle(ex,symbols,starttime,end,candle,tf):
-           def get_ohlcv_candle(ubra,symbols,interval,start,delta_filter,starttime,end,candle)
+           def get_ohlcv_candle(ubra,symbols,interval,start,delta_filter,starttime,end,candle):
                 start_str=start+' ago UTC'
                 OHLCV1=pd.DataFrame()
                 for symbol in symbols:
