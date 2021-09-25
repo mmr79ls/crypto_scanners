@@ -387,30 +387,54 @@ if  program=='candle_search':
            
            end=st.text_input('Enter the end of period to search for','2021-09-02 00:00:00')
            candle=st.number_input('enter the candle change %',0.0)
+           delta_filter=st.number_input('enter the Delta to filter %',0.0)
            end=pd.Timestamp(end)
-           
-           def get_ohlcv_candle(ex,symbols,starttime,end,candle,tf):
-               OHLCV1=pd.DataFrame()
-               since=ex.parse8601(starttime)
-               for symbol in symbols:
-                    a=pd.DataFrame(ex.fetch_ohlcv (symbol,tf, since=since),columns=['Time','Open','High','Low','Close','Volume'])
-                   
-                    a['change']= comp_prev(a)
-                    a=a[abs(a['change'])>=candle]
-                    if len(a):
-                         a['Date']=pd.to_datetime(a['Time']*1000000)
-                         a['symbol']=symbol
-                         OHLCV1=pd.concat([a,OHLCV1],ignore_index=True)
-               OHLCV1=OHLCV1.set_index('Date')
-               OHLCV1=OHLCV1[(OHLCV1.index>=starttime) & (OHLCV1.index<=end)]
+           start=st.text_input('the history you need  x days ago','2 days')
+           ubra = BinanceRestApiManager()
+           #def get_ohlcv_candle(ex,symbols,starttime,end,candle,tf):
+           def get_ohlcv_candle(ubra,symbols,interval,start,delta_filter,starttime,end,candle):
+                start_str=start+' ago UTC'
+                OHLCV1=pd.DataFrame()
+                for symbol in symbols:
+                          symbol=symbol.replace("/","")
+                          df=pd.DataFrame(ubra.get_historical_klines(symbol=symbol,interval=interval,start_str=start_str),columns=['Time','Open','High','Low','Close','Volume','Close time','Quote asset volume','Number of trades','Taker buy base asset volume','Taker buy quote asset volume','ignore'])
+                          df=df.astype( dtype={
+                               'Open': float,
+                               'High': float,
+                               'Low': float,
+                               'Close': float,
+                               'Volume': float,
+
+                               'Quote asset volume': float,
+                               'Number of trades': float,
+                                'Taker buy base asset volume': float,
+                               'Taker buy quote asset volume': float,
+                               'ignore': float
+
+                                           })
+                          df=df[df['Time']==df['Time'].max()]
+                          df['symbol']=symbol
+                          df['interval']=interval
+                          df['change']=100*(df['High']-(df['Low']))/(df['Low'])
+                          df['Date']=pd.to_datetime(df['Time']*1000000)
+                          df['interval']=df['interval']
+                          df['Buy']=(df['Quote asset volume'])-(df['Taker buy quote asset volume'])
+                          df['Delta']=((df['Quote asset volume'])-(df['Taker buy quote asset volume']))-(df['Taker buy quote asset volume'])
+                          df=df[abs(df['change'])>=candle]
+                          df=df[abs(df['Delta'])>=delta_filter]
+                          df['percentage']=df['Delta']*100/df['Quote asset volume']
+                          OHLCV1=pd.concat([df,OHLCV1],ignore_index=True)
+                OHLCV1=OHLCV1.set_index('Date')
+                OHLCV1=OHLCV1[(OHLCV1.index>=starttime) & (OHLCV1.index<=end)]
+
+                return OHLCV1
                
-               return OHLCV1
-               
-           df=get_ohlcv_candle(ex,symbols,starttime,end,candle,tf)
-           
+           #df=get_ohlcv_candle(ex,symbols,starttime,end,candle,tf)
+           df=get_ohlcv_candle(ubra,symbols,tf,start,delta_filter,starttime,end,candle)
            flag2=st.button('rescan again')
            if flag2==1:
                caching.clear_cache()
-               df=get_ohlcv_candle(ex,symbols,starttime,end,candle,tf)
+               #df=get_ohlcv_candle(ex,symbols,starttime,end,candle,tf)
+               df=get_ohlcv_candle(ubra,symbols,tf,start,delta_filter,starttime,end,candle)
           
            st.dataframe(df)
