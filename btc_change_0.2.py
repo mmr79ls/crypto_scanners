@@ -108,13 +108,15 @@ def scan_RSI(ex,symbol,tf,RSI=40,flag=0,starttime='2021-09-02 00:00:00',end='202
         l=[]
     return l
 def price_calculator():
-        exchange=st.selectbox('Exchange',['binance','okex','gateio'])
+        exchange=st.selectbox('Exchange',['binance','okex','gateio','binance_futures'])
         if exchange=='binance':
             ex=ccxt.binance()
         elif exchange=='okex':    
             ex=ccxt.okex()
         elif exchange=='gateio':
             ex=ccxt.gateio()
+        elif exchange=='binance_futures':
+            ex=ccxt.binanceusdm()
         df_BTC=pd.DataFrame(ex.fetch_ohlcv('BTC/USDT','1h',limit=1),columns=['Time','Open','High','Low','Close','Volume'])
         btc_price=df_BTC.Close.values[0]
         f=pd.DataFrame(ex.fetch_markets())
@@ -151,7 +153,7 @@ if program=='BTC_change':
    
         with streamlit_analytics.track():    
             quote=st.selectbox('Symbol',['USDT','BTC'])
-            exchange=st.selectbox('Exchange',['binance','okex','gateio'])
+            exchange=st.selectbox('Exchange',['binance','okex','gateio','binance_futures])
             #percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
             flag=st.button('rescan again')
             if flag==1:
@@ -251,11 +253,13 @@ if program=='BTC_change':
                     symbols=closes['symbol'].drop_duplicates().to_list()
                     closes.set_index('symbol',inplace=True)
                     if exchange=='binance':
-                       ex=ccxt.binance()
+                           ex=ccxt.binance()
                     elif exchange=='okex':    
-                       ex=ccxt.okex()
+                           ex=ccxt.okex()
                     elif exchange=='gateio':
-                       ex=ccxt.gateio()
+                           ex=ccxt.gateio()
+                    elif exchange=='binance_futures':
+                           ex=ccxt.binanceusdm()
 
                     symbol=st.sidebar.radio('Symbol',symbols)
 
@@ -306,14 +310,15 @@ def rsi(ex,tf,RSI,flag,starttime,end,trend):
     return df_rsi
 if  program=='RSI':
      with streamlit_analytics.track():  
-           exchange=st.selectbox('Exchange',['binance','okex','gateio'])
+           exchange=st.selectbox('Exchange',['binance','okex','gateio','binance_futures'])
            if exchange=='binance':
-               ex=ccxt.binance()
+                 ex=ccxt.binance()
            elif exchange=='okex':    
-               ex=ccxt.okex()
+                 ex=ccxt.okex()
            elif exchange=='gateio':
-               ex=ccxt.gateio()
-           
+                 ex=ccxt.gateio()
+           elif exchange=='binance_futures':
+                 ex=ccxt.binanceusdm()
            f=pd.DataFrame(ex.fetch_markets())
            symbs=f[f['active']==True].symbol.unique()
 
@@ -358,13 +363,15 @@ def comp_prev(a,shift=1):
         return (a.Close-a.Close.shift(shift))*100/a.Close          
 if  program=='candle_search':
       with streamlit_analytics.track():                 
-           exchange=st.selectbox('Exchange',['binance','okex','gateio'])
+           exchange=st.selectbox('Exchange',['binance','okex','gateio','binance_futures'])
            if exchange=='binance':
-               ex=ccxt.binance()
+                ex=ccxt.binance()
            elif exchange=='okex':    
-               ex=ccxt.okex()
+                ex=ccxt.okex()
            elif exchange=='gateio':
-               ex=ccxt.gateio()
+                ex=ccxt.gateio()
+           elif exchange=='binance_futures':
+                ex=ccxt.binanceusdm()
            
            f=pd.DataFrame(ex.fetch_markets())
            symbs=f[f['active']==True].symbol.unique()
