@@ -305,6 +305,7 @@ def rsi(ex,tf,RSI,flag,starttime,end,trend):
                 df_rsi=pd.concat([df_rsi,l])
     return df_rsi
 if  program=='RSI':
+     with streamlit_analytics.track():  
            exchange=st.selectbox('Exchange',['binance','okex','gateio'])
            if exchange=='binance':
                ex=ccxt.binance()
@@ -356,7 +357,7 @@ if  program=='RSI':
 def comp_prev(a,shift=1):
         return (a.Close-a.Close.shift(shift))*100/a.Close          
 if  program=='candle_search':
-                     
+      with streamlit_analytics.track():                 
            exchange=st.selectbox('Exchange',['binance','okex','gateio'])
            if exchange=='binance':
                ex=ccxt.binance()
