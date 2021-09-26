@@ -153,7 +153,7 @@ if program=='BTC_change':
    
         with streamlit_analytics.track():    
             quote=st.selectbox('Symbol',['USDT','BTC'])
-            exchange=st.selectbox('Exchange',['binance','okex','gateio','binance_futures])
+            exchange=st.selectbox('Exchange',['binance','okex','gateio','binance_futures'])
             #percentage=st.number_input('Enter percantage for orderbook aggregation',0.5)
             flag=st.button('rescan again')
             if flag==1:
