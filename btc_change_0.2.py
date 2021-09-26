@@ -414,7 +414,7 @@ if  program=='candle_search':
                                'ignore': float
 
                                            })
-                          df=df[df['Time']==df['Time'].max()]
+                          #df=df[df['Time']==df['Time'].max()]
                           df['symbol']=symbol
                           df['interval']=interval
                           df['change']=100*(df['High']-(df['Low']))/(df['Low'])
