@@ -197,7 +197,7 @@ class crypto():
         elif exchange=='gateio':
             exchange=ccxt.gateio()
         elif exchange=='binance_futures':
-            ex=ccxt.binanceusdm()
+            exchange=ccxt.binanceusdm()
         exchange.load_markets()
         OHLCV=pd.DataFrame()
         print(OHLCV)
