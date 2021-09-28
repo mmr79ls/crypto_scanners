@@ -513,7 +513,7 @@ if  program=='falcone1':
               caching.clear_cache()
               df=scan_vwap()
               z=df[df.index==df.index.max()].sort_values('price_diff')
-              z=z.drop(columns=['Time','Open','High','Low'],axis=1)
+              z=z.drop(columns=['Time','open','high','low'],axis=1)
 
 
 
