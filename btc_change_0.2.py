@@ -506,13 +506,17 @@ if  program=='falcone1':
           stop=pd.Timestamp(stop)
           flag=st.button('rescan again')
           df=scan_vwap()
+          filters=st.number_input('VWAP distance from price ',0.0)
+          
           #st.dataframe(df)
           z=df[df.index==df.index.max()].sort_values('price_diff')
+          z=z[abs(z.price_diff)<=filters]
           #z=z.drop(columns=['Time','Open','High','Low'],axis=1)
           if flag==1:
               caching.clear_cache()
               df=scan_vwap()
               z=df[df.index==df.index.max()].sort_values('price_diff')
+              z=z[abs(z.price_diff)<=filters]
               #z=z.drop(columns=['Time','open','high','low'],axis=1)
 
 
