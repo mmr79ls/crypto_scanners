@@ -449,7 +449,7 @@ if  program=='candle_search':
            st.dataframe(df)
 
                
-  def scan():
+def scan():
     df=pd.DataFrame()
     data=pd.DataFrame()
     for symbol in symbols:
