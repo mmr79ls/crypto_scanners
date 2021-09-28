@@ -144,7 +144,7 @@ def price_calculator():
         print('profit is ',profit)
         print('profit in BTC ',profit_BTC)
         return change,profit,profit_BTC
-program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','RSI','candle_search'])
+program=st.selectbox('btc change or profit calculator',['BTC_change','Price_calculator','RSI','candle_search','falcone1])
 if program=='Price_calculator':
     change,profit,profit_BTC=price_calculator()
 
@@ -447,3 +447,67 @@ if  program=='candle_search':
                df=get_ohlcv_candle(ubra,symbols,tf,start,delta_filter,starttime,end,candle)
           
            st.dataframe(df)
+
+               
+  def scan():
+    df=pd.DataFrame()
+    data=pd.DataFrame()
+    for symbol in symbols:
+        try:
+            z=asyncio.run(get_df(symbol,tf,since=start))
+            z=z[(z.index<=stop) & (z.index>=start)]        
+            z[tf]=TA.VWAP(z)     
+            z['price_diff']=(z[tf]-z['close'])*100/z['close']        
+            z['symbol']=symbol
+            df=pd.concat([z,df])
+            df['tf']=tf
+        except:
+            continue
+    z=df[df.index==df.index.max()].sort_values('price_diff')
+    return z
+if  program=='falcone1':
+     ex=ccxt.binance()
+     f=pd.DataFrame(ex.fetch_markets())
+     symbs=f[f['active']==True].symbol.unique()
+     s=[]
+     u=[]
+     for symbol in symbs:
+
+              if symbol.split('/')[1]=='USDT':
+                 u.append(symbol)
+
+     symbols=[]        
+     for i in u:
+         t=(i.find('UP/') + i.find('DOWN/') + i.find('BULL/') + i.find('BEAR/')+i.find('USDC/')+i.find('PAX/')+i.find('PAXG/')+i.find('TUSD/')+i.find('USDP/')+i.find('EUR/')+i.find('SUSD/')+i.find('BUSD/'))
+         #print(i,'  ',t)
+         if(t==-12):
+             symbols.append(i)  
+
+     #symbol='BTC/USDT'
+     tf='1h'
+     since='2021-07-26 00:00:00'
+
+     async def get_df(symbol,tf,since):
+         since=ex.parse8601(since)
+         df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf))
+         df.columns=['Time','open','high','low','close','volume']
+         df['Date']=pd.to_datetime(df['Time']*1000000)
+         df.set_index('Date',inplace=True)
+         return df
+     tf=st.selectbox('select TF ',['15m','1h','4h','1d','1w','1M'])
+     #tfs=['4h']
+     data=pd.DataFrame()
+
+     start = st.text_input("start date to check",'2021-09-13 12:00:00')
+     start=pd.Timestamp(start)
+     stop = st.text_input("end date to check",'2021-10-13 12:00:00')
+     stop=pd.Timestamp(stop)
+     flag=st.button('rescan again')
+     z=scan()
+     if flag==1:
+         caching.clear_cache()
+         z=scan()
+
+
+
+     st.dataframe(z)
