@@ -508,10 +508,12 @@ if  program=='falcone1':
      df=scan_vwap()
      st.dataframe(df)
      z=df[df.index==df.index.max()].sort_values('price_diff')
+     z=z.drop(columns=['Time','Open','High','Low'],axis=1)
      if flag==1:
          caching.clear_cache()
          df=scan_vwap()
          z=df[df.index==df.index.max()].sort_values('price_diff')
+         z=z.drop(columns=['Time','Open','High','Low'],axis=1)
 
 
      
