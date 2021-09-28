@@ -504,9 +504,10 @@ if  program=='falcone1':
           start=pd.Timestamp(start)
           stop = st.text_input("end date to check",'2021-10-13 12:00:00')
           stop=pd.Timestamp(stop)
+          filters=st.number_input('VWAP distance from price ',0.0)
           flag=st.button('rescan again')
           df=scan_vwap()
-          filters=st.number_input('VWAP distance from price ',0.0)
+          
           
           #st.dataframe(df)
           z=df[df.index==df.index.max()].sort_values('price_diff')
