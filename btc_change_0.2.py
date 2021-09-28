@@ -467,54 +467,54 @@ def scan_vwap():
     return df
 if  program=='falcone1':
 
+     with streamlit_analytics.track():   
+          ex=ccxt.binance()
+          f=pd.DataFrame(ex.fetch_markets())
+          symbs=f[f['active']==True].symbol.unique()
+          s=[]
+          u=[]
+          for symbol in symbs:
 
-     ex=ccxt.binance()
-     f=pd.DataFrame(ex.fetch_markets())
-     symbs=f[f['active']==True].symbol.unique()
-     s=[]
-     u=[]
-     for symbol in symbs:
+                   if symbol.split('/')[1]=='USDT':
+                      u.append(symbol)
 
-              if symbol.split('/')[1]=='USDT':
-                 u.append(symbol)
+          symbols=[]        
+          for i in u:
+              t=(i.find('UP/') + i.find('DOWN/') + i.find('BULL/') + i.find('BEAR/')+i.find('USDC/')+i.find('PAX/')+i.find('PAXG/')+i.find('TUSD/')+i.find('USDP/')+i.find('EUR/')+i.find('SUSD/')+i.find('BUSD/'))
+              #print(i,'  ',t)
+              if(t==-12):
+                  symbols.append(i)  
 
-     symbols=[]        
-     for i in u:
-         t=(i.find('UP/') + i.find('DOWN/') + i.find('BULL/') + i.find('BEAR/')+i.find('USDC/')+i.find('PAX/')+i.find('PAXG/')+i.find('TUSD/')+i.find('USDP/')+i.find('EUR/')+i.find('SUSD/')+i.find('BUSD/'))
-         #print(i,'  ',t)
-         if(t==-12):
-             symbols.append(i)  
+          #symbol='BTC/USDT'
+          tf='1h'
+          since='2021-07-26 00:00:00'
 
-     #symbol='BTC/USDT'
-     tf='1h'
-     since='2021-07-26 00:00:00'
+          def get_df(symbol,tf,since):
+              since=ex.parse8601(since)
+              df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf))
+              df.columns=['Time','open','high','low','close','volume']
+              df['Date']=pd.to_datetime(df['Time']*1000000)
+              df.set_index('Date',inplace=True)
+              return df
+          tf=st.selectbox('select TF ',['15m','1h','4h','1d','1w','1M'])
+          #tfs=['4h']
+          data=pd.DataFrame()
 
-     def get_df(symbol,tf,since):
-         since=ex.parse8601(since)
-         df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf))
-         df.columns=['Time','open','high','low','close','volume']
-         df['Date']=pd.to_datetime(df['Time']*1000000)
-         df.set_index('Date',inplace=True)
-         return df
-     tf=st.selectbox('select TF ',['15m','1h','4h','1d','1w','1M'])
-     #tfs=['4h']
-     data=pd.DataFrame()
-
-     start = st.text_input("start date to check",'2021-09-13 12:00:00')
-     start=pd.Timestamp(start)
-     stop = st.text_input("end date to check",'2021-10-13 12:00:00')
-     stop=pd.Timestamp(stop)
-     flag=st.button('rescan again')
-     df=scan_vwap()
-     st.dataframe(df)
-     z=df[df.index==df.index.max()].sort_values('price_diff')
-     z=z.drop(columns=['Time','Open','High','Low'],axis=1)
-     if flag==1:
-         caching.clear_cache()
-         df=scan_vwap()
-         z=df[df.index==df.index.max()].sort_values('price_diff')
-         z=z.drop(columns=['Time','Open','High','Low'],axis=1)
+          start = st.text_input("start date to check",'2021-09-13 12:00:00')
+          start=pd.Timestamp(start)
+          stop = st.text_input("end date to check",'2021-10-13 12:00:00')
+          stop=pd.Timestamp(stop)
+          flag=st.button('rescan again')
+          df=scan_vwap()
+          st.dataframe(df)
+          z=df[df.index==df.index.max()].sort_values('price_diff')
+          z=z.drop(columns=['Time','Open','High','Low'],axis=1)
+          if flag==1:
+              caching.clear_cache()
+              df=scan_vwap()
+              z=df[df.index==df.index.max()].sort_values('price_diff')
+              z=z.drop(columns=['Time','Open','High','Low'],axis=1)
 
 
-     
-     st.dataframe(z)
+
+          st.dataframe(z)
