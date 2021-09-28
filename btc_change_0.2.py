@@ -449,7 +449,7 @@ if  program=='candle_search':
            st.dataframe(df)
 
                
-def scan():
+def scan_vwap():
     df=pd.DataFrame()
     data=pd.DataFrame()
     for symbol in symbols:
@@ -466,6 +466,8 @@ def scan():
     
     return df
 if  program=='falcone1':
+
+
      ex=ccxt.binance()
      f=pd.DataFrame(ex.fetch_markets())
      symbs=f[f['active']==True].symbol.unique()
@@ -503,12 +505,12 @@ if  program=='falcone1':
      stop = st.text_input("end date to check",'2021-10-13 12:00:00')
      stop=pd.Timestamp(stop)
      flag=st.button('rescan again')
-     df=scan()
+     df=scan_vwap()
      st.dataframe(df)
      z=df[df.index==df.index.max()].sort_values('price_diff')
      if flag==1:
          caching.clear_cache()
-         df=scan()
+         df=scan_vwap()
          z=df[df.index==df.index.max()].sort_values('price_diff')
 
 
