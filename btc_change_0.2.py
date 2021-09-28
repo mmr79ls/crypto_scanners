@@ -454,7 +454,7 @@ def scan():
     data=pd.DataFrame()
     for symbol in symbols:
         try:
-            z=asyncio.run(get_df(symbol,tf,since=start))
+            z=get_df(symbol,tf,since=start)
             z=z[(z.index<=stop) & (z.index>=start)]        
             z[tf]=TA.VWAP(z)     
             z['price_diff']=(z[tf]-z['close'])*100/z['close']        
