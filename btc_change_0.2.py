@@ -506,7 +506,7 @@ if  program=='falcone1':
           stop=pd.Timestamp(stop)
           flag=st.button('rescan again')
           df=scan_vwap()
-          st.dataframe(df)
+          #st.dataframe(df)
           z=df[df.index==df.index.max()].sort_values('price_diff')
           z=z.drop(columns=['Time','Open','High','Low'],axis=1)
           if flag==1:
