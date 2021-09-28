@@ -489,7 +489,7 @@ if  program=='falcone1':
      tf='1h'
      since='2021-07-26 00:00:00'
 
-     async def get_df(symbol,tf,since):
+     def get_df(symbol,tf,since):
          since=ex.parse8601(since)
          df=pd.DataFrame(ex.fetch_ohlcv(symbol,tf))
          df.columns=['Time','open','high','low','close','volume']
