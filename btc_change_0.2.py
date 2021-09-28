@@ -504,6 +504,7 @@ if  program=='falcone1':
      stop=pd.Timestamp(stop)
      flag=st.button('rescan again')
      df=scan()
+     st.dataframe(df)
      z=df[df.index==df.index.max()].sort_values('price_diff')
      if flag==1:
          caching.clear_cache()
@@ -511,5 +512,5 @@ if  program=='falcone1':
          z=df[df.index==df.index.max()].sort_values('price_diff')
 
 
-
+     
      st.dataframe(z)
