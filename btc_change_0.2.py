@@ -27,6 +27,111 @@ hide_streamlit_style = """
 footer {visibility: hidden;}
 </style>
 """
+def add_entry():
+    data={}
+
+    data['symbol']=symbol=st.selectbox('select symbol to add or edit',symbols)
+    myquery = { "symbol": symbol}
+    mydoc = mycol.find(myquery)
+    if mydoc.retrieved!=0:
+        price=mydoc['price']
+        Entry1=mydoc['Entry1']
+        Entry2=mydoc['Entry2']
+        TP1=mydoc['TP1']
+        TP2=mydoc['TP2']
+        comments=mydoc['comments']
+        date=mydoc['date']
+        links=mydoc['links']
+    else:
+        price=str(ex.fetch_ticker(symbol)['close'])
+        Entry1='0.0000'
+        Entry2='0.0000'
+        TP1='0.0000'
+        TP2='0.0000'
+        comments='  '
+        date=str(datetime.now())
+        links=' '
+        
+    data['price']=st.text_input('current price',price)
+    data['Entry1']=st.text_input('Entry 1', Entry1)
+    data['Entry2']=st.text_input('Entry 2',Entry2)
+    data['TP1']=st.text_input('take profit 1', TP1)
+    data['TP2']=st.text_input('take profit 2', TP2)
+    data['comments']=st.text_area('Comments',comments)
+    data['date']=st.text_input('Date',date)
+    data['links']=st.text_area('links',links)
+    if st.button('save'):
+        st.write(data)
+        x=mycol.insert_one(data)
+        st.write('Database updated')
+        print(x)
+        
+
+   
+def program():
+    choice=st.selectbox('what do you want to do',['add_entry','view'])
+    if choice == 'add_entry':
+            add_entry()
+    elif choice == 'view':
+            mydoc = mycol.find().sort("symbol")
+            df=pd.DataFrame(mydoc)
+            st.dataframe(df)
+            
+            symbol=st.selectbox('select symbol to modify',df['symbol'])
+            data=df[df['symbol']==symbol].to_dict()
+            data = mycol.find_one({'symbol': symbol})
+
+            if data is not None:
+                data['price']=st.text_input('current price',data['price'])
+                data['Entry1']=st.text_input('Entry 1', data['Entry1'])
+                data['Entry2']=st.text_input('Entry 2',data['Entry2'])
+                data['TP1']=st.text_input('take profit 1', data['TP1'])
+                data['TP2']=st.text_input('take profit 2', data['TP2'])
+                data['comments']=st.text_area('Comments',data['comments'])
+                data['date']=st.text_input('Date',data['date'])
+                data['links']=st.text_area('links',data['links'])
+                if st.button('save'):
+                    st.write(data)
+                    #x=mycol.insert_one(data)
+                    x=mycol.save(data)  
+                    st.write('Database updated')
+                    print(x)
+        
+ 
+     
+@st.cache(allow_output_mutation=True)
+def trades_tracker():
+     ca = certifi.where()
+     database=st.secrets('database')
+     client = pymongo.MongoClient(database,tlsCAFile=ca)
+     db = client.test
+     db = client["trades"]
+     mycol = db["symbols"])
+     ex=ccxt.binance()
+     f=pd.DataFrame(ex.load_markets()).T
+     symbols=f['symbol'].to_list()
+     if username==st.secrets["Username"]:
+         password = text_field("Password", type="password") 
+         if password ==st.secrets["password"]:
+                 st.write('Login successful')
+
+                 program()
+         else if len(password>0):
+                 st.write('Password is wrong')
+           
+def text_field(label, columns=None, **input_params):
+    c1, c2 = st.beta_columns(columns or [1, 4])
+
+    # Display field name with some alignment
+    c1.markdown("##")
+    c1.markdown(label)
+
+    # Sets a default key parameter to avoid duplicate key errors
+    input_params.setdefault("key", label)
+
+    # Forward text input parameters
+    return c2.text_input("", **input_params)
+
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 @st.cache(allow_output_mutation=True)
 def OHLCV(percentage,quote,time_tuple=(2021, 3, 20, 00, 00, 00, 0, 00, 0),tf='1h',exchange='binance'):
@@ -144,7 +249,7 @@ def price_calculator():
         print('profit is ',profit)
         print('profit in BTC ',profit_BTC)
         return change,profit,profit_BTC
-program=st.selectbox('btc change or profit calculator',['falcone1','Price_calculator','BTC_change','RSI','candle_search'])
+program=st.selectbox('btc change or profit calculator',['falcone1','Price_calculator','BTC_change','RSI','candle_search','Trades_tracker'])
 if program=='Price_calculator':
     change,profit,profit_BTC=price_calculator()
 
@@ -523,3 +628,6 @@ if  program=='falcone1':
 
 
           st.dataframe(z)
+import certifi
+if program=='Trades_tracker':
+     trades_tracker()
