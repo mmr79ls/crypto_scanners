@@ -68,7 +68,7 @@ def add_entry():
         
 
    
-def program_trades():
+def program_trades(client,mycol,symbols):
     choice=st.selectbox('what do you want to do',['add_entry','view'])
     if choice == 'add_entry':
             add_entry()
@@ -115,8 +115,7 @@ def trades_tracker():
          password = text_field("Password", type="password") 
          if password ==st.secrets["password"]:
                  st.write('Login successful')
-
-                 program_trades()
+                 program_trades(client,mycol,symbols)
          elif len(password)>0:
                  st.write('Password is wrong')
            
