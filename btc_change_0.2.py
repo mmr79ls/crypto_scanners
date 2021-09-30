@@ -106,7 +106,7 @@ def trades_tracker():
      client = pymongo.MongoClient(database,tlsCAFile=ca)
      db = client.test
      db = client["trades"]
-     mycol = db["symbols"])
+     mycol = db["symbols"]
      ex=ccxt.binance()
      f=pd.DataFrame(ex.load_markets()).T
      symbols=f['symbol'].to_list()
