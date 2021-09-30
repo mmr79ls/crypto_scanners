@@ -27,7 +27,7 @@ hide_streamlit_style = """
 footer {visibility: hidden;}
 </style>
 """
-def add_entry(client,mycol,symbols):
+def add_entry(client,mycol,symbols,ex):
     data={}
 
     data['symbol']=symbol=st.selectbox('select symbol to add or edit',symbols)
@@ -68,10 +68,10 @@ def add_entry(client,mycol,symbols):
         
 
    
-def program_trades(client,mycol,symbols):
+def program_trades(client,mycol,symbols,ex):
     choice=st.selectbox('what do you want to do',['add_entry','view'])
     if choice == 'add_entry':
-            add_entry(client,mycol,symbols)
+            add_entry(client,mycol,symbols,ex)
     elif choice == 'view':
             mydoc = mycol.find().sort("symbol")
             df=pd.DataFrame(mydoc)
@@ -115,7 +115,7 @@ def trades_tracker():
          password = text_field("Password", type="password") 
          if password ==st.secrets["password"]:
                  st.write('Login successful')
-                 program_trades(client,mycol,symbols)
+                 program_trades(client,mycol,symbols,ex)
          elif len(password)>0:
                  st.write('Password is wrong')
            
