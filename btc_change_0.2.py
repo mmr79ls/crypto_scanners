@@ -117,11 +117,11 @@ def trades_tracker():
                  st.write('Login successful')
 
                  program()
-         elif len(password>0):
+         elif len(password)>0):
                  st.write('Password is wrong')
            
 def text_field(label, columns=None, **input_params):
-    c1, c2 = st.beta_columns(columns or [1, 4])
+    c1, c2 = st.columns(columns or [1, 4])
 
     # Display field name with some alignment
     c1.markdown("##")
