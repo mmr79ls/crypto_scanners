@@ -76,6 +76,7 @@ def program_trades(client,mycol,symbols,ex):
             mydoc = mycol.find().sort("symbol")
             st.write('hi')
             df=pd.DataFrame(mydoc)
+            df=df.drop(columns=['_id'],axis=1)
             st.dataframe(df)
             
             symbol=st.selectbox('select symbol to modify',df['symbol'])
