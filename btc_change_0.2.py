@@ -116,7 +116,7 @@ def trades_tracker():
                  st.write('Login successful')
 
                  program()
-         else if len(password>0):
+         elif len(password>0):
                  st.write('Password is wrong')
            
 def text_field(label, columns=None, **input_params):
