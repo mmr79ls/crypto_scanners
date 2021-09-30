@@ -110,6 +110,7 @@ def trades_tracker():
      f=pd.DataFrame(ex.load_markets()).T
      symbols=f['symbol'].to_list()
      username= text_field("Username")
+     st.write(username)
      if username==st.secrets["username"]:
          password = text_field("Password", type="password") 
          if password ==st.secrets["password"]:
