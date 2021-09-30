@@ -84,14 +84,14 @@ def program_trades(client,mycol,symbols,ex):
             data = mycol.find_one({'symbol': symbol})
 
             if data is not None:
-                data['price']=st.text_input('current price',data['price'][0])
-                data['Entry1']=st.text_input('Entry 1', data['Entry1'][0])
-                data['Entry2']=st.text_input('Entry 2',data['Entry2'][0])
-                data['TP1']=st.text_input('take profit 1', data['TP1'][0])
-                data['TP2']=st.text_input('take profit 2', data['TP2'][0])
-                data['comments']=st.text_area('Comments',data['comments'][0])
-                data['date']=st.text_input('Date',data['date'][0])
-                data['links']=st.text_area('links',data['links'][0])
+                data['price']=st.text_input('current price',data['price'])
+                data['Entry1']=st.text_input('Entry 1', data['Entry1'])
+                data['Entry2']=st.text_input('Entry 2',data['Entry2'])
+                data['TP1']=st.text_input('take profit 1', data['TP1'])
+                data['TP2']=st.text_input('take profit 2', data['TP2'])
+                data['comments']=st.text_area('Comments',data['comments'])
+                data['date']=st.text_input('Date',data['date'])
+                data['links']=st.text_area('links',data['links'])
                 if st.button('save'):
                     st.write(data)
                     #x=mycol.insert_one(data)
