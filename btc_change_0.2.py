@@ -27,7 +27,7 @@ hide_streamlit_style = """
 footer {visibility: hidden;}
 </style>
 """
-def add_entry():
+def add_entry(client,mycol,symbols):
     data={}
 
     data['symbol']=symbol=st.selectbox('select symbol to add or edit',symbols)
@@ -71,7 +71,7 @@ def add_entry():
 def program_trades(client,mycol,symbols):
     choice=st.selectbox('what do you want to do',['add_entry','view'])
     if choice == 'add_entry':
-            add_entry()
+            add_entry(client,mycol,symbols)
     elif choice == 'view':
             mydoc = mycol.find().sort("symbol")
             df=pd.DataFrame(mydoc)
