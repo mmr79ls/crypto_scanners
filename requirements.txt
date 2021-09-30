@@ -2,7 +2,7 @@
 
 # C:\Users\mraslan\Downloads\project\crypto1.py: 20
 bokeh == 2.4.0
-
+pymongo==3.12.0
 # C:\Users\mraslan\Downloads\project\crypto1.py: 3
 # C:\Users\mraslan\Downloads\project\scanner_v0.1.py: 3
 ccxt == 1.56.84
