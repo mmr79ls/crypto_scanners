@@ -99,7 +99,6 @@ def program():
         
  
      
-@st.cache(allow_output_mutation=True)
 def trades_tracker():
      ca = certifi.where()
      database=st.secrets("database")
