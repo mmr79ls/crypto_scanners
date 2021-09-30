@@ -4,7 +4,7 @@ Created on Thu Sep 23 17:05:54 2021
 
 @author: mraslan
 """
-
+import pymongo
 from unicorn_binance_rest_api.unicorn_binance_rest_api_manager import BinanceRestApiManager
      
 import ccxt
@@ -102,7 +102,6 @@ def program():
 def trades_tracker():
      ca = certifi.where()
      database=st.secrets["database"]
-     st.write(database)
      client = pymongo.MongoClient(database,tlsCAFile=ca)
      db = client.test
      db = client["trades"]
