@@ -21,7 +21,7 @@ seaborn == 0.11.0
 
 plotly==5.1.0
 # C:\Users\mraslan\Downloads\project\scanner_v0.1.py: 6
-streamlit == 0.79.0
+streamlit == 0.89.0
 
 # C:\Users\mraslan\Downloads\project\crypto1.py: 21
 tweepy == 3.10.0
