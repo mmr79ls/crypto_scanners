@@ -74,6 +74,7 @@ def program_trades(client,mycol,symbols,ex):
             add_entry(client,mycol,symbols,ex)
     elif choice == 'view':
             mydoc = mycol.find().sort("symbol")
+            st.write('hi')
             df=pd.DataFrame(mydoc)
             st.dataframe(df)
             
