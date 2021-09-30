@@ -101,7 +101,7 @@ def program():
      
 def trades_tracker():
      ca = certifi.where()
-     database=st.secrets("database")
+     database=st.secrets["database"]
      st.write(database)
      client = pymongo.MongoClient(database,tlsCAFile=ca)
      db = client.test
