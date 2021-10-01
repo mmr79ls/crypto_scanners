@@ -61,8 +61,10 @@ def add_entry(client,mycol,symbols,ex):
     data['date']=st.text_input('Date',date)
     data['links']=st.text_area('links',links)
     if st.button('save'):
+     
         st.write(data)
         x=mycol.insert_one(data)
+        caching.clear_cache()
         st.write('Database updated')
         print(x)
         
