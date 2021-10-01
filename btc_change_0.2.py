@@ -64,7 +64,6 @@ def add_entry(client,mycol,symbols,ex):
         st.write(data)
         x=mycol.insert_one(data)
         st.write('Database updated')
-        view_tracker(mycol)
         print(x)
         
 
@@ -74,9 +73,6 @@ def program_trades(client,mycol,symbols,ex):
     if choice == 'add_entry':
             add_entry(client,mycol,symbols,ex)
     elif choice == 'view':
-               view_tracker(mycol)
-        
-def view_tracker(mycol):
             mydoc = mycol.find().sort("symbol")
             df=pd.DataFrame(mydoc)
             df=df.drop(columns=['_id'],axis=1)
