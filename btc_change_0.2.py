@@ -77,7 +77,7 @@ def program_trades(client,mycol,symbols,ex):
                view_tracker(mycol)
         
 def view_tracker(mycol):
-             mydoc = mycol.find().sort("symbol")
+            mydoc = mycol.find().sort("symbol")
             df=pd.DataFrame(mydoc)
             df=df.drop(columns=['_id'],axis=1)
             st.dataframe(df)
