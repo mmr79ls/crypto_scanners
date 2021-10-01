@@ -64,14 +64,7 @@ def add_entry(client,mycol,symbols,ex):
         st.write(data)
         x=mycol.insert_one(data)
         st.write('Database updated')
-        price=str(ex.fetch_ticker(symbol)['close'])
-        Entry1='0.0000'
-        Entry2='0.0000'
-        TP1='0.0000'
-        TP2='0.0000'
-        comments='  '
-        date=str(datetime.now())
-        links=' '
+        view_tracker(mycol)
         print(x)
         
 
@@ -81,7 +74,10 @@ def program_trades(client,mycol,symbols,ex):
     if choice == 'add_entry':
             add_entry(client,mycol,symbols,ex)
     elif choice == 'view':
-            mydoc = mycol.find().sort("symbol")
+               view_tracker(mycol)
+        
+def view_tracker(mycol):
+             mydoc = mycol.find().sort("symbol")
             df=pd.DataFrame(mydoc)
             df=df.drop(columns=['_id'],axis=1)
             st.dataframe(df)
@@ -105,8 +101,6 @@ def program_trades(client,mycol,symbols,ex):
                     x=mycol.save(data)  
                     st.write('Database updated')
                     print(x)
-        
- 
      
 def trades_tracker():
      ca = certifi.where()
