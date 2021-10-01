@@ -64,6 +64,7 @@ def add_entry(client,mycol,symbols,ex):
         st.write(data)
         x=mycol.insert_one(data)
         st.write('Database updated')
+        choice == 'view'
         print(x)
         
 
@@ -74,7 +75,6 @@ def program_trades(client,mycol,symbols,ex):
             add_entry(client,mycol,symbols,ex)
     elif choice == 'view':
             mydoc = mycol.find().sort("symbol")
-            st.write('hi')
             df=pd.DataFrame(mydoc)
             df=df.drop(columns=['_id'],axis=1)
             st.dataframe(df)
