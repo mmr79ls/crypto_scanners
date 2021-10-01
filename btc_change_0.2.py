@@ -52,15 +52,15 @@ def add_entry(client,mycol,symbols,ex):
         date=str(datetime.now())
         links=' '
     placeholder = st.empty()
-     
-    data['price']=placeholder.text_input('current price',price)
-    data['Entry1']=placeholder.text_input('Entry 1', Entry1)
-    data['Entry2']=placeholder.text_input('Entry 2',Entry2)
-    data['TP1']=placeholder.text_input('take profit 1', TP1)
-    data['TP2']=placeholder.text_input('take profit 2', TP2)
-    data['comments']=placeholder.text_area('Comments',comments)
-    data['date']=placeholder.text_input('Date',date)
-    data['links']=placeholder.text_area('links',links)
+    with placeholder.container():
+         data['price']=st.text_input('current price',price)
+         data['Entry1']=st.text_input('Entry 1', Entry1)
+         data['Entry2']=st.text_input('Entry 2',Entry2)
+         data['TP1']=st.text_input('take profit 1', TP1)
+         data['TP2']=st.text_input('take profit 2', TP2)
+         data['comments']=st.text_area('Comments',comments)
+         data['date']=st.text_input('Date',date)
+         data['links']=st.text_area('links',links)
     if st.button('save'):
      
         st.write(data)
