@@ -29,7 +29,7 @@ footer {visibility: hidden;}
 """
 def add_entry(client,mycol,symbols,ex):
     data={}
-
+    
     data['symbol']=symbol=st.selectbox('select symbol to add or edit',symbols)
     myquery = { "symbol": symbol}
     mydoc = mycol.find(myquery)
@@ -64,9 +64,14 @@ def add_entry(client,mycol,symbols,ex):
         st.write(data)
         x=mycol.insert_one(data)
         st.write('Database updated')
-        mydoc.retrieved=0
-        choice == 'view'
-        
+        price=str(ex.fetch_ticker(symbol)['close'])
+        Entry1='0.0000'
+        Entry2='0.0000'
+        TP1='0.0000'
+        TP2='0.0000'
+        comments='  '
+        date=str(datetime.now())
+        links=' '
         print(x)
         
 
