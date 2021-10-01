@@ -64,7 +64,9 @@ def add_entry(client,mycol,symbols,ex):
         st.write(data)
         x=mycol.insert_one(data)
         st.write('Database updated')
+        mydoc.retrieved=0
         choice == 'view'
+        
         print(x)
         
 
