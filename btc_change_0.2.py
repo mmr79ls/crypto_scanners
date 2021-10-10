@@ -479,23 +479,38 @@ if  program=='candle_search':
                 ex=ccxt.gateio()
            elif exchange=='binance_futures':
                 ex=ccxt.binanceusdm()
-           
-           f=pd.DataFrame(ex.fetch_markets())
-           symbs=f[f['active']==True].symbol.unique()
+           ex=ccxt.binance()
+          f=pd.DataFrame(ex.fetch_markets())
+          symbols=f[f['active']==True].symbol.unique()
 
-           s=[]
-           u=[]
-           for symbol in symbs:
-          
+
+          s=[]
+          u=[]
+          z=[]
+          for symbol in symbols:
+              if symbol.split('/')[1]=='BTC':
+                  s.append(symbol)
               if symbol.split('/')[1]=='USDT':
-                u.append(symbol)
-           symbols=[]        
-           for i in u:
-                 t=i.find('DOWN/' or 'UP/' or 'BULL/' or 'BEAR/')
-                 if(t==-1):
-                        symbols.append(i)
-                        
-           
+                  u.append(symbol.split('/')[0])
+                  z.append(symbol)
+
+          #since=since = ex.milliseconds () - (75*86380000)
+          symbo=[]
+          for i in s:
+                  if i.split('/')[0] not in u:
+                      if (i!='YOYOW/BTC') and (i!='WBTC/BTC'):
+                              symbo.append(i)
+          symbols=[]        
+          for i in z:
+              t=(i.find('UP/') + i.find('DOWN/') + i.find('BULL/') + i.find('BEAR/')+i.find('USDC/')+i.find('PAX/')+i.find('PAXG/')+i.find('TUSD/')+i.find('USDP/')+i.find('EUR/')+i.find('SUSD/')+i.find('BUSD/'))
+              #print(i,'  ',t)
+              if(t==-12):
+                  symbols.append(i)  
+                     f=pd.DataFrame(ex.fetch_markets())
+                     symbs=f[f['active']==True].symbol.unique()
+           ss=st.selectbox('USDT or BTC',['USDT','BTC'])
+           if ss=='BTC':
+              symbols=symbo             
            #symbol=st.selectbox('Symbol',symbols)
            #symbol=st.sidebar.radio('Symbol',symbols)
            tf=st.selectbox('Time Frame',['1m','5m','15m','1h','4h','1d','1w','1M'])
