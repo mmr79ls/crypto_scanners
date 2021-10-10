@@ -480,14 +480,12 @@ if  program=='candle_search':
            elif exchange=='binance_futures':
                 ex=ccxt.binanceusdm()
            ex=ccxt.binance()
-          f=pd.DataFrame(ex.fetch_markets())
-          symbols=f[f['active']==True].symbol.unique()
-
-
-          s=[]
-          u=[]
-          z=[]
-          for symbol in symbols:
+           f=pd.DataFrame(ex.fetch_markets())
+           symbols=f[f['active']==True].symbol.unique()
+           s=[]
+           u=[]
+           z=[]
+           for symbol in symbols:
               if symbol.split('/')[1]=='BTC':
                   s.append(symbol)
               if symbol.split('/')[1]=='USDT':
@@ -495,13 +493,13 @@ if  program=='candle_search':
                   z.append(symbol)
 
           #since=since = ex.milliseconds () - (75*86380000)
-          symbo=[]
-          for i in s:
+           symbo=[]
+           for i in s:
                   if i.split('/')[0] not in u:
                       if (i!='YOYOW/BTC') and (i!='WBTC/BTC'):
                               symbo.append(i)
-          symbols=[]        
-          for i in z:
+           symbols=[]        
+           for i in z:
               t=(i.find('UP/') + i.find('DOWN/') + i.find('BULL/') + i.find('BEAR/')+i.find('USDC/')+i.find('PAX/')+i.find('PAXG/')+i.find('TUSD/')+i.find('USDP/')+i.find('EUR/')+i.find('SUSD/')+i.find('BUSD/'))
               #print(i,'  ',t)
               if(t==-12):
