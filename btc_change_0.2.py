@@ -504,8 +504,8 @@ if  program=='candle_search':
               #print(i,'  ',t)
               if(t==-12):
                   symbols.append(i)  
-                     f=pd.DataFrame(ex.fetch_markets())
-                     symbs=f[f['active']==True].symbol.unique()
+                  f=pd.DataFrame(ex.fetch_markets())
+                  symbs=f[f['active']==True].symbol.unique()
            ss=st.selectbox('USDT or BTC',['USDT','BTC'])
            if ss=='BTC':
               symbols=symbo             
