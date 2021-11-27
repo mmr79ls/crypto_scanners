@@ -268,7 +268,8 @@ def ohlcv(ex,since,symbol,data):
         data=pd.concat([price,data])
         return data,price
 def comp_prev(a,shift=1):
-    return (a.High-a.Close.shift(shift))*100/a.Close.shift(shift)#a.High
+    #return (a.High-a.Close.shift(shift))*100/a.Close.shift(shift)#a.High
+    return (a.High-a.Low.shift(shift))*100/a.Low.shift(shift)#a.High
 
 def comp_prev_spread(a,shift=1):
         return (a.spread-a.spread.shift(shift))*100/a.spread
