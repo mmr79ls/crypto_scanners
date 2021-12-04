@@ -17,7 +17,7 @@ from crypto_func import BTC_drop_change,group_tweets,plot_bokeh,Volume_change
 from datetime import datetime
 from finta import TA
 import matplotlib.pyplot as plt
-from streamlit import caching
+from streamlit import legacy_caching.caching
 import streamlit_analytics
 
 import plotly.express as px
