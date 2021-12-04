@@ -23,6 +23,7 @@ import json
 import pandas as pd
 
 def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,vchange_low,vchange_high,flag): 
+        try:
             ref=OHLCV[OHLCV['Date'] == start]
             df=OHLCV[(OHLCV['Date'] > start) & (OHLCV['Date'] <= end)]
             l=[]
@@ -35,7 +36,7 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,
         
             ref['change']=l
             filtered=ref
-            print('filtered',len(filtered))
+            #print('filtered',len(filtered))
          
             
             OHLCV_change=filtered[(filtered['change']>=change_low) & (filtered['change']<=change_high)].sort_values('change')
@@ -48,7 +49,9 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,
                 OHLCV_change=OHLCV_change.join(v, on='symbol')
                 OHLCV_change['volume_change']=100*(OHLCV_change['old_volume']-OHLCV_change['new_volume'])/OHLCV_change['new_volume']
                 OHLCV_change=OHLCV_change[(OHLCV_change['volume_change']>=vchange_low) &(OHLCV_change['volume_change']<=vchange_high)]
-           
+        except:
+            OHLCV_change=pd.DataFrame()
+            continue
             return OHLCV_change
         
 def Volume_change(OHLCV,start1,end1,start2,end2,change1,change2):
