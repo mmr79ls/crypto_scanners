@@ -26,7 +26,7 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,
             ref=OHLCV[OHLCV['Date'] == start]
             df=OHLCV[(OHLCV['Date'] > start) & (OHLCV['Date'] <= end)]
             l=[]
-            df_btc=filtered[filtered['symbol']=='BTC/USDT']
+            df_btc=df[df['symbol']=='BTC/USDT']
             a=df_btc[df_btc.index>=start].High.idxmax()
             b=df_btc[df_btc.index>start].Low.idxmin()
             for symbol in ref.symbol:
