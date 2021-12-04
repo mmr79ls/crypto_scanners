@@ -39,6 +39,7 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,
                # l.append((filtered[filtered['symbol']==symbol].Low.min()-ref[ref['symbol']==symbol].Close.max())*100/ref[ref['symbol']==symbol].Close.max())
                         l.append((f.loc[b].Low.min()-f.loc[a].High.max())*100/f.loc[a].High.max())
                 except:
+                        l.append('NA')
                         continue
             ref['change']=l
             filtered=ref
