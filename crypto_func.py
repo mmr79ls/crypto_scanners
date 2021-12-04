@@ -35,8 +35,9 @@ def BTC_drop_change(OHLCV,start,end,change_low,change_high,v_start,v_end,volume,
             print(str(a),str(b))
             for symbol in ref.symbol:
                 try:
+                        f=df[df['symbol']==symbol]
                # l.append((filtered[filtered['symbol']==symbol].Low.min()-ref[ref['symbol']==symbol].Close.max())*100/ref[ref['symbol']==symbol].Close.max())
-                        l.append((df.loc[b].Low.min()-df.loc[a].High.max())*100/df.loc[a].High.max())
+                        l.append((f.loc[b].Low.min()-f.loc[a].High.max())*100/f.loc[a].High.max())
                 except:
                         continue
             ref['change']=l
